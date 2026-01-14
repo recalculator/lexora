@@ -46,6 +46,19 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+    
+    def model_post_init(self, __context):
+        """Post-init: Add sslmode=require for Railway Postgres if not present."""
+        # Railway Postgres requires sslmode=require
+        # Add it if not present and DATABASE_URL is from env (not default)
+        if self.database_url and "postgresql" in self.database_url.lower():
+            # Check if sslmode is already in URL
+            if "sslmode" not in self.database_url.lower():
+                # Add sslmode=require
+                if "?" in self.database_url:
+                    self.database_url += "&sslmode=require"
+                else:
+                    self.database_url += "?sslmode=require"
 
 
 settings = Settings()

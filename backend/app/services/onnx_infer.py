@@ -1,5 +1,4 @@
 """ONNX inference service for ClauseRiskNet."""
-import onnxruntime as ort
 import numpy as np
 import json
 from pathlib import Path
@@ -9,6 +8,15 @@ from app.core.logging import get_logger
 from app.services.sklearn_infer import get_sklearn_service, is_sklearn_available
 
 logger = get_logger()
+
+# Graceful import of onnxruntime - app should not crash if unavailable
+try:
+    import onnxruntime as ort
+    ONNXRUNTIME_AVAILABLE = True
+except ImportError:
+    ONNXRUNTIME_AVAILABLE = False
+    ort = None
+    logger.warning("onnxruntime not available - ONNX model inference will be disabled")
 
 # Clause type labels (CUAD dataset categories, subset for MVP)
 CLAUSE_TYPES = [
@@ -48,6 +56,11 @@ class ONNXInferenceService:
     
     def _load_model(self):
         """Load ONNX model."""
+        if not ONNXRUNTIME_AVAILABLE:
+            logger.warning("onnxruntime not installed - ONNX model inference disabled")
+            self.session = None
+            return
+            
         model_path_obj = Path(self.model_path)
         if not model_path_obj.exists():
             logger.warning(
@@ -147,7 +160,8 @@ class ONNXInferenceService:
         Returns:
             Dictionary with keys: clause_type, risk_score, confidence, type_probs
         """
-        if self.session is None:
+        if not ONNXRUNTIME_AVAILABLE or self.session is None:
+            # ONNX runtime not available or model not loaded
             # Try sklearn fallback
             sklearn_service = get_sklearn_service()
             if sklearn_service:
@@ -211,7 +225,13 @@ class ONNXInferenceService:
     
     def get_model_status(self) -> str:
         """Get current model status."""
-        if self.session is not None:
+        if not ONNXRUNTIME_AVAILABLE:
+            # If onnxruntime is not installed, skip ONNX check
+            if is_sklearn_available():
+                return "sklearn"
+            else:
+                return "dummy"
+        elif self.session is not None:
             return "onnx"
         elif is_sklearn_available():
             return "sklearn"
