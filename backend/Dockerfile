@@ -25,4 +25,5 @@ EXPOSE ${PORT:-8000}
 
 # Start command: run migrations then start server
 # Railway sets PORT env var automatically
-CMD sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Using shell form to support env var substitution and multiple commands
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
