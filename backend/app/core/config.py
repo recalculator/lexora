@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     
     # API
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = int(os.getenv("PORT", "8000"))  # Railway sets PORT env var
     
     # LLM
     openai_api_key: str = ""

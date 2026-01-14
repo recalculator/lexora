@@ -151,9 +151,22 @@ Key environment variables (see `.env.example`):
 
 - `OPENAI_API_KEY` - OpenAI or OpenRouter API key
 - `OPENAI_API_BASE` - API base URL (defaults to OpenAI)
-- `DATABASE_URL` - PostgreSQL connection string
+- `DATABASE_URL` - PostgreSQL connection string (required for production)
 - `REDIS_URL` - Redis connection string
+- `PORT` - Server port (defaults to 8000, Railway sets this automatically)
 - `MODEL_PATH` - Path to ONNX model file
+
+### Production Dependencies
+
+**Production deployments use `requirements-prod.txt` only** - this excludes heavy ML dependencies (torch, transformers, sentence-transformers) to reduce image size and deployment time.
+
+**ML dependencies** (`requirements-ml.txt`) are for local training/experimentation only and include:
+- sentence-transformers
+- torch
+- transformers
+- onnxruntime
+
+These are not needed for production inference since the sklearn model artifacts are pre-trained and loaded via joblib.
 
 ## Development
 

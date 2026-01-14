@@ -20,8 +20,9 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/storage /app/models
 
-# Expose port
-EXPOSE 8000
+# Expose port (Railway sets PORT env var)
+EXPOSE ${PORT:-8000}
 
-# Default command (will be overridden by docker-compose)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start command: run migrations then start server
+# Railway sets PORT env var automatically
+CMD sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
