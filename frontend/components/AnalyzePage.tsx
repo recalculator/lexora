@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Clause, analyzeDocument, getReport, explainClause } from '@/lib/api'
+import { Clause, analyzeDocument, getReport, explainClause, getDocumentSummary } from '@/lib/api'
 import RiskOverview from './RiskOverview'
 import ClauseList from './ClauseList'
 import PDFViewer from './PDFViewer'
