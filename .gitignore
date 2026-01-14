@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+**/__pycache__/
+**/.pytest_cache/
+
+# Node
+node_modules/
+.next/
+out/
+build/
+*.log
+**/node_modules/
+**/.next/
+**/dist/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*
+!*.env.example
+**/.env
+**/.env.local
+**/.env.*
+!**/*.env.example
+*.pem
+*.key
+*.p12
+*.crt
+*.pfx
+
+# Storage and uploads
+storage/
+backend/storage/
+backend/app/static/uploads/
+*.pdf
+!sample-contract.pdf
+
+# Models (large files)
+*.onnx
+*.bin
+*.safetensors
+models/
+!ml/models/.gitkeep
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+**/.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ML training
+checkpoints/
+wandb/
+runs/
+*.pt
+*.pth

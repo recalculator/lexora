@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Colors - Legal/Espresso Theme */
+  --brand: #4B2E2A;
+  --brand-2: #7A3E2F;
+  --brand-light: #8B5A4A;
+  --brand-lighter: #A67C6B;
+  
+  /* Background - Parchment/Ivory */
+  --bg: #FBF7F2;
+  --bg-card: #FFFFFF;
+  --bg-muted: #F5F1EB;
+  
+  /* Borders & Dividers */
+  --border: #E8E3DC;
+  --border-strong: #D4C9BC;
+  
+  /* Text Colors - Warm Grays */
+  --text: #2C2418;
+  --text-muted: #6B5E52;
+  --text-subtle: #9B8E80;
+  
+  /* Risk Colors - Muted but Clear */
+  --risk-low: #16A34A;
+  --risk-low-bg: #DCFCE7;
+  --risk-medium: #D97706;
+  --risk-medium-bg: #FEF3C7;
+  --risk-high: #DC2626;
+  --risk-high-bg: #FEE2E2;
+  --risk-critical: #991B1B;
+  --risk-critical-bg: #FECACA;
+  
+  /* Fonts */
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--bg)] text-[var(--text)] antialiased;
+    font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    @apply text-[var(--text)] font-bold;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] shadow-sm;
+  }
+  
+  .card-inner {
+    @apply rounded-xl;
+  }
+  
+  .btn-primary {
+    @apply bg-[var(--brand)] text-white px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-[var(--brand-2)] transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border border-[var(--brand)] text-[var(--brand)] px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-[var(--brand)] hover:text-white transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .badge-clause {
+    @apply text-xs bg-[var(--bg-muted)] text-[var(--brand)] border border-[var(--brand)] px-2 py-1 rounded-full font-medium;
+  }
+  
+  .badge-risk-low {
+    @apply text-xs bg-[var(--risk-low-bg)] text-[var(--risk-low)] px-2 py-1 rounded-full font-semibold;
+  }
+  
+  .badge-risk-medium {
+    @apply text-xs bg-[var(--risk-medium-bg)] text-[var(--risk-medium)] px-2 py-1 rounded-full font-semibold;
+  }
+  
+  .badge-risk-high {
+    @apply text-xs bg-[var(--risk-high-bg)] text-[var(--risk-high)] px-2 py-1 rounded-full font-semibold;
+  }
+  
+  .badge-risk-critical {
+    @apply text-xs bg-[var(--risk-critical-bg)] text-[var(--risk-critical)] px-2 py-1 rounded-full font-semibold;
+  }
+}

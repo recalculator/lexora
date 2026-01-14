@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: lexora_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lexora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lexora123}
+      POSTGRES_DB: ${POSTGRES_DB:-lexora}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lexora"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lexora_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lexora_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://lexora:lexora123@postgres:5432/lexora}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      # OPENAI_API_KEY and OPENAI_API_BASE loaded from .env via env_file
+      MODEL_PATH: /app/models/clause_risknet.onnx
+      CALIBRATION_PATH: /app/models/calibration.json
+      STORAGE_PATH: /app/storage
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001,http://localhost:3002
+    volumes:
+      - ./backend:/app
+      - ./ml/models:/app/models
+      - backend_storage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lexora_frontend
+    ports:
+      - "3002:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  backend_storage:
+
+networks:
+  default:
+    name: lexora_network
