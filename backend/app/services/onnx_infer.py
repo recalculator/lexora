@@ -9,14 +9,9 @@ from app.services.sklearn_infer import get_sklearn_service, is_sklearn_available
 
 logger = get_logger()
 
-# Graceful import of onnxruntime - app should not crash if unavailable
-try:
-    import onnxruntime as ort
-    ONNXRUNTIME_AVAILABLE = True
-except ImportError:
-    ONNXRUNTIME_AVAILABLE = False
-    ort = None
-    logger.warning("onnxruntime not available - ONNX model inference will be disabled")
+# Lazy import - will be set when onnxruntime is actually needed
+ONNXRUNTIME_AVAILABLE = None
+_ort_module = None
 
 # Clause type labels (CUAD dataset categories, subset for MVP)
 CLAUSE_TYPES = [
@@ -56,10 +51,26 @@ class ONNXInferenceService:
     
     def _load_model(self):
         """Load ONNX model."""
-        if not ONNXRUNTIME_AVAILABLE:
+        # Lazy import of onnxruntime - only when actually needed
+        global ONNXRUNTIME_AVAILABLE, _ort_module
+        if ONNXRUNTIME_AVAILABLE is None:
+            try:
+                import onnxruntime as ort
+                ONNXRUNTIME_AVAILABLE = True
+                _ort_module = ort  # Store for reuse
+            except ImportError:
+                ONNXRUNTIME_AVAILABLE = False
+                _ort_module = None
+                logger.warning("onnxruntime not available - ONNX model inference will be disabled")
+                self.session = None
+                return
+        
+        if not ONNXRUNTIME_AVAILABLE or _ort_module is None:
             logger.warning("onnxruntime not installed - ONNX model inference disabled")
             self.session = None
             return
+        
+        ort = _ort_module
             
         model_path_obj = Path(self.model_path)
         if not model_path_obj.exists():
@@ -225,7 +236,8 @@ class ONNXInferenceService:
     
     def get_model_status(self) -> str:
         """Get current model status."""
-        if not ONNXRUNTIME_AVAILABLE:
+        # Check if onnxruntime is available (lazy check)
+        if ONNXRUNTIME_AVAILABLE is False or (ONNXRUNTIME_AVAILABLE is None and self.session is None):
             # If onnxruntime is not installed, skip ONNX check
             if is_sklearn_available():
                 return "sklearn"
