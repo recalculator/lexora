@@ -1,0 +1,8 @@
+# ML/Training dependencies for Lexora backend
+# Only install these when training models or doing ML experiments
+# These are heavy dependencies (torch, transformers, etc.)
+
+sentence-transformers>=2.2.0
+torch>=2.0.0
+transformers>=4.41.0
+onnxruntime==1.16.3

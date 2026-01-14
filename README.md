@@ -162,8 +162,13 @@ Key environment variables (see `.env.example`):
 cd backend
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-prod.txt
 uvicorn app.main:app --reload
+```
+
+**For ML/Training (optional):**
+```bash
+pip install -r requirements-ml.txt
 ```
 
 ### Frontend
