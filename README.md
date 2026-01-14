@@ -158,15 +158,15 @@ Key environment variables (see `.env.example`):
 
 ### Production Dependencies
 
-**Production deployments use `requirements-prod.txt` only** - this excludes heavy ML dependencies (torch, transformers, sentence-transformers) to reduce image size and deployment time.
+**Production deployments use `requirements.txt` (core dependencies)** - this excludes heavy ML dependencies (torch, transformers, sentence-transformers) to reduce image size and deployment time.
 
 **ML dependencies** (`requirements-ml.txt`) are for local training/experimentation only and include:
-- sentence-transformers
+- sentence-transformers (for sklearn classifier embeddings)
 - torch
 - transformers
 - onnxruntime
 
-These are not needed for production inference since the sklearn model artifacts are pre-trained and loaded via joblib.
+**Note**: The app boots and all endpoints work without ML dependencies. The sklearn classifier requires `sentence-transformers` (in `requirements-ml.txt`), but the app gracefully falls back to ONNX or dummy classifier if unavailable. TF-IDF retrieval (used for RAG) works with core dependencies only (uses sklearn's TfidfVectorizer).
 
 ## Development
 
@@ -175,14 +175,18 @@ These are not needed for production inference since the sklearn model artifacts 
 cd backend
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements-prod.txt
+# Core dependencies (required for production)
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
 **For ML/Training (optional):**
 ```bash
+# Install heavy ML dependencies (torch, sentence-transformers, etc.)
 pip install -r requirements-ml.txt
 ```
+
+**Note**: The app works without ML dependencies. The sklearn classifier requires `sentence-transformers`, but gracefully falls back to ONNX or dummy classifier if unavailable. TF-IDF retrieval (used for RAG) works with core dependencies only.
 
 ### Frontend
 ```bash
