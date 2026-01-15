@@ -43,7 +43,7 @@ storage/
 backend/storage/
 backend/app/static/uploads/
 *.pdf
-!sample-contract.pdf
+!backend/app/static/sample_contract.pdf
 
 # Models (large files)
 *.onnx
