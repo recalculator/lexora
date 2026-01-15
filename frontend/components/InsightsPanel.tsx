@@ -168,19 +168,6 @@ export default function InsightsPanel({
           </div>
         )}
       </div>
-
-      {/* Footer Actions */}
-      {explanation && onGenerateExplanation && (
-        <div className="p-5 border-t border-border flex gap-2 flex-shrink-0">
-          <button
-            onClick={onGenerateExplanation}
-            disabled={loading}
-            className="btn-secondary flex-1 text-xs"
-          >
-            {loading ? 'Regenerating...' : 'Regenerate'}
-          </button>
-        </div>
-      )}
     </div>
   )
 }

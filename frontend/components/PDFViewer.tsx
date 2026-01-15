@@ -21,6 +21,12 @@ export default function PDFViewer({ documentId }: PDFViewerProps) {
     setNumPages(numPages)
   }
 
+  // Reset page number when documentId changes
+  const onDocumentLoadError = () => {
+    setNumPages(null)
+    setPageNumber(1)
+  }
+
   return (
     <div className="card h-full flex flex-col overflow-hidden">
       {/* Header */}
@@ -34,8 +40,10 @@ export default function PDFViewer({ documentId }: PDFViewerProps) {
       {/* PDF Content */}
       <div className="flex-1 overflow-auto p-5 bg-bg-card">
         <Document
+          key={documentId}
           file={pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
+          onLoadError={onDocumentLoadError}
           loading={
             <div className="flex items-center justify-center h-full">
               <div className="text-sm text-text-muted">Loading PDF...</div>
