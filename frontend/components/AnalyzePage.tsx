@@ -58,11 +58,20 @@ export default function AnalyzePage({
     }
   }, [documentId])
 
-  // Load document info on mount
+  // Load document info on mount and when documentId changes
   useEffect(() => {
+    // Reset state when documentId changes
+    setDocumentInfo(null)
+    setOverallRisk('low')
+    setError(null)
+    setExplanation(null)
+    setExplanationError(null)
+    setExplanationLoading(false)
+    
+    // Load new document info
     loadDocumentInfo()
     loadModelStatus()
-  }, [loadDocumentInfo])
+  }, [documentId, loadDocumentInfo])
 
   const loadModelStatus = useCallback(async () => {
     try {
@@ -80,6 +89,14 @@ export default function AnalyzePage({
     setError(null)
     try {
       const response = await analyzeDocument(documentId)
+      
+      // Check if already analyzed
+      if (response.status === 'already_analyzed') {
+        // Reload document info to get existing clauses
+        await loadDocumentInfo()
+        return
+      }
+      
       onAnalysisComplete(response.clauses)
       setDocumentInfo(prev => prev ? { ...prev, lastAnalyzed: new Date() } : null)
       
@@ -102,6 +119,9 @@ export default function AnalyzePage({
       onAnalyzingChange(false)
     }
   }
+  
+  // Check if document has already been analyzed
+  const isAlreadyAnalyzed = (clausesFromAnalysis && clausesFromAnalysis.length > 0) || documentInfo?.lastAnalyzed !== null
 
   const handleRiskClick = (clauseIdx: number) => {
     const clauses = clausesFromAnalysis || []
@@ -177,10 +197,11 @@ export default function AnalyzePage({
             <div className="flex items-center gap-3">
               <button
                 onClick={handleAnalyze}
-                disabled={isAnalyzing}
+                disabled={isAnalyzing || isAlreadyAnalyzed}
                 className="btn-primary"
+                title={isAlreadyAnalyzed ? 'Document has already been analyzed' : ''}
               >
-                {isAnalyzing ? 'Analyzing...' : 'Analyze Document'}
+                {isAnalyzing ? 'Analyzing...' : isAlreadyAnalyzed ? 'Already Analyzed' : 'Analyze Document'}
               </button>
             </div>
           </div>
