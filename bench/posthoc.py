@@ -134,7 +134,35 @@ def filtered_with_exact(db, eval_vecs, original):
     return out
 
 
-def hybrid_candidate_diagnostics(db, texts_vecs):
+def index_state(db, reindex: bool):
+    """Record the HNSW index as found at start; optionally REINDEX it here.
+
+    The script cannot know what happened to the index before it started
+    (rebuilds, bloat from rolled-back test inserts), so it records only facts
+    it can measure plus any REINDEX it performs itself.
+    """
+    def snapshot():
+        return {
+            "definition": db.scalar("SELECT indexdef FROM pg_indexes WHERE indexname = %s", (RB.HNSW_INDEX,)),
+            "size_bytes": int(db.scalar("SELECT pg_relation_size(%s::regclass)", (RB.HNSW_INDEX,))),
+            "captured_utc": datetime.now(timezone.utc).isoformat(),
+        }
+
+    state = {"index": RB.HNSW_INDEX, "at_start": snapshot(), "reindex_by_this_script": reindex}
+    if reindex:
+        t0 = time.perf_counter()
+        db.q(f"REINDEX INDEX {RB.HNSW_INDEX}")
+        state["reindex_seconds"] = time.perf_counter() - t0
+        db.q("ANALYZE reference_clauses")
+        state["after_reindex"] = snapshot()
+        state["note"] = "REINDEX was run by this script before any measurement; see at_start / after_reindex."
+    else:
+        state["note"] = ("No REINDEX was run by this script. The index history before this run (earlier "
+                         "rebuilds or manual REINDEX) is not known to the script; at_start records its size.")
+    return state
+
+
+def hybrid_candidate_diagnostics(db, texts_vecs, state):
     db.reset()
     db.set(hnsw__ef_search=RB.HYBRID_EF_SEARCH)
     short = []
@@ -149,7 +177,8 @@ def hybrid_candidate_diagnostics(db, texts_vecs):
         "FROM pg_stat_user_tables WHERE relname = 'reference_clauses'"
     )[0]
     return {
-        "note": "Measured on the current index (rebuilt by part B of the original run), not the index Part A used.",
+        "note": ("Measured on the index as it stood during this run (see index_state), not the index the "
+                 "original run's Part A used. " + state["note"]),
         "hnsw_ef_search": RB.HYBRID_EF_SEARCH,
         "queries_returning_fewer_than_50": short,
         "reference_clauses_stats": {
@@ -183,6 +212,11 @@ def render(path: Path, r: dict):
             for m in modes]
         for c, e in fx["categories"].items()
     ]))
+    st = r["index_state"]
+    lines.append("\n## Index state\n")
+    lines.append(f"{st['note']} Size at start: {st['at_start']['size_bytes']} bytes"
+                 + (f"; after REINDEX: {st['after_reindex']['size_bytes']} bytes." if st.get("after_reindex") else ".")
+                 + "\n")
     d = r["diagnostics"]
     lines.append("\n## Diagnostics: hybrid HNSW leg candidates\n")
     lines.append(f"{d['note']} Queries returning fewer than 50 at ef_search={d['hnsw_ef_search']}: "
@@ -201,6 +235,8 @@ def main():
     parser.add_argument("--env", required=True, choices=["local", "azure"])
     parser.add_argument("--original", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, default=ROOT / "bench/results")
+    parser.add_argument("--reindex", action="store_true",
+                        help=f"REINDEX {RB.HNSW_INDEX} before measuring (recorded in index_state)")
     args = parser.parse_args()
     args.dry_run = False
 
@@ -246,6 +282,8 @@ def main():
         "environment": RB.environment(db, args, ROOT / "bench/corpus/cuad_corpus_meta.json",
                                       ROOT / "bench/corpus/cuad_split.json", len(ref), len(eval_rows)),
     }
+    result["index_state"] = index_state(db, args.reindex)
+    RB.log(f"Index state: {result['index_state']['note']}")
     RB.log("Paired bootstrap")
     result["paired_bootstrap"] = paired_bootstrap(original, per_query, ref_cats)
     RB.log("Filtered search with exact GIN mode")
@@ -254,7 +292,7 @@ def main():
     result["diagnostics"] = hybrid_candidate_diagnostics(db, {
         "clause": ([r["text"] for r in eval_rows], eval_vecs),
         "question": ([q["text"] for q in questions], question_vecs),
-    })
+    }, result["index_state"])
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = args.out_dir / f"{stamp}_{args.env}_posthoc.json"
