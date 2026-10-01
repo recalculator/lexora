@@ -86,3 +86,27 @@ longer than 256 tokens are truncated by the model (counts in `bench/corpus/cuad_
 Bundled `sample_contract.pdf`, stages timed separately: extract, segment, classify, embed, insert
 (rolled back afterwards), retrieve (related clauses + precedents for the priority clauses). 3 warmup
 runs discarded, 20 timed; median and p95 per stage.
+
+## Amendment, 2026-10-01: made after results were seen (post-hoc)
+
+This amendment was written **after** the results in
+`bench/results/20261001T165752Z_local.json` were seen. Both analyses below are **post-hoc** and are
+reported as such. They do not change any pre-registered metric, query set, or method, and the
+original results file and its companions are left unmodified. Their outputs go to a new results file
+(`bench/results/<timestamp>_<env>_posthoc.json`) written by `bench/posthoc.py`.
+
+1. **Exact filtered search latency (post-hoc).** For the same 20 categories as the filtered-search
+   section (10 most and 10 least frequent in the reference split) and the same 200-query sample
+   (seed 42), measure exact filtered search, i.e. `enable_indexscan = off` and
+   `enable_seqscan = off` so Postgres uses the GIN index on `categories` and sorts by exact
+   distance, as the app now does for filtered precedent lookups. Report client round-trip p50/p95
+   and server execution p50/p95 (`EXPLAIN (ANALYZE, BUFFERS)`, separate pass), recall@10 against
+   exact filtered kNN, mean result count, and the plan. The existing filtered modes (planner
+   default, HNSW forced, HNSW forced with iterative scan relaxed/strict) are re-run in the same
+   pass so all modes in the new file come from one run.
+2. **Paired bootstrap (post-hoc).** On the clause-as-query set of the original run (per-query
+   rankings in `bench/results/20261001T165752Z_local_perquery.json.gz`), compute per-query P@3 and
+   P@10 and the paired differences hybrid − tfidf and vector_exact − tfidf. Report the mean paired
+   difference with a 95% percentile bootstrap CI (10,000 resamples of queries, seed 42). The
+   per-method means recomputed from the per-query file must equal the means in the original results
+   file; the script fails otherwise.

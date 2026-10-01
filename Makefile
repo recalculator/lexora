@@ -82,7 +82,7 @@ CLIENT_INFO = -e BENCH_CLIENT_CPU="$$(sysctl -n machdep.cpu.brand_string 2>/dev/
 	-e BENCH_DOCKER_RESOURCES="$$(docker info --format '{{.NCPU}} CPUs, {{.MemTotal}} bytes memory')" \
 	-e BENCH_AZURE_SKU -e BENCH_HOST_DESC
 
-.PHONY: bench bench-dry bench-image bench-test corpus load-corpus check-db-url
+.PHONY: bench bench-dry bench-posthoc bench-image bench-test corpus load-corpus check-db-url
 
 check-db-url:
 	@if [ "$(ENV)" != "local" ] && [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL must be set for ENV=$(ENV)"; exit 1; fi
@@ -111,3 +111,9 @@ bench-dry: check-db-url bench-image
 	mkdir -p $(DRY_OUT)
 	docker run --rm $(BENCH_NET) $(BENCH_DB) $(GIT_INFO) $(CLIENT_INFO) -v "$(CURDIR):/repo" \
 		-v "$(DRY_OUT):/dry" -w /repo $(BENCH_IMAGE) python bench/run_bench.py --env $(ENV) --dry-run --out-dir /dry
+
+# Post-hoc analyses (PREREGISTRATION.md post-hoc amendment); ORIGINAL=bench/results/<stamp>_<env>.json
+bench-posthoc: check-db-url bench-image
+	@if [ -z "$(ORIGINAL)" ]; then echo "ORIGINAL=bench/results/<stamp>_<env>.json is required"; exit 1; fi
+	docker run --rm $(BENCH_NET) $(BENCH_DB) $(GIT_INFO) $(CLIENT_INFO) \
+		-v "$(CURDIR):/repo" -w /repo $(BENCH_IMAGE) python bench/posthoc.py --env $(ENV) --original $(ORIGINAL)
