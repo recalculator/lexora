@@ -1,0 +1,4183 @@
+{
+  "posthoc": true,
+  "amendment": "bench/PREREGISTRATION.md, 2026-10-01 post-hoc amendment",
+  "original_results": "bench/results/20261001T165752Z_local.json",
+  "environment": {
+    "env": "local",
+    "timestamp_utc": "2026-10-01T19:20:47.422991+00:00",
+    "dry_run": false,
+    "postgres_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+    "postgres_server_version_num": "160015",
+    "pgvector_version": "0.8.6",
+    "db_host": "postgres",
+    "db_ssl": false,
+    "host_description": "local Docker",
+    "azure_sku": null,
+    "server_settings": {
+      "shared_buffers": "128MB",
+      "work_mem": "4MB",
+      "maintenance_work_mem": "64MB",
+      "effective_cache_size": "4GB",
+      "max_parallel_workers_per_gather": "2",
+      "max_parallel_maintenance_workers": "2",
+      "hnsw.ef_search": "40",
+      "hnsw.iterative_scan": "off",
+      "hnsw.max_scan_tuples": "20000",
+      "ivfflat.probes": "1"
+    },
+    "client": {
+      "platform": "Linux-7.0.12-linuxkit-aarch64-with-glibc2.41",
+      "python": "3.11.16",
+      "cpu_count_visible": 10,
+      "cpu_model_container": null,
+      "host_cpu": "Apple M5",
+      "docker_resources": "10 CPUs, 8319504384 bytes memory"
+    },
+    "corpus": {
+      "reference_rows": 6766,
+      "eval_rows": 1924,
+      "corpus_meta_sha256": "66061f04f0daf7f29ec29d0ef9443813782bbe1d00ab71b02464379766247483",
+      "split_sha256": "fe5abcc46adffe9f01512ef6c2ba1dce2599902a8e43ea66dda252710323be1f"
+    },
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "seed": 42,
+    "git": {
+      "commit": "d965684a615f71f4432333a56a3a88e2ef9acc95",
+      "dirty_files": 0,
+      "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "paired_bootstrap": {
+    "n_queries": 2176,
+    "resamples": 10000,
+    "seed": 42,
+    "recomputed_means_match_original": true,
+    "comparisons": {
+      "hybrid - tfidf": {
+        "precision@3": {
+          "mean_difference": 0.08394607843137254,
+          "ci95": [
+            0.07138480392156857,
+            0.09650735294117639
+          ],
+          "share_of_queries_better": 0.2867647058823529,
+          "share_of_queries_worse": 0.12270220588235294
+        },
+        "precision@10": {
+          "mean_difference": 0.062224264705882354,
+          "ci95": [
+            0.05404411764705879,
+            0.07035845588235294
+          ],
+          "share_of_queries_better": 0.42463235294117646,
+          "share_of_queries_worse": 0.19439338235294118
+        }
+      },
+      "vector_exact - tfidf": {
+        "precision@3": {
+          "mean_difference": 0.035845588235294115,
+          "ci95": [
+            0.0203737745098039,
+            0.051317401960784284
+          ],
+          "share_of_queries_better": 0.28125,
+          "share_of_queries_worse": 0.21369485294117646
+        },
+        "precision@10": {
+          "mean_difference": 0.02486213235294118,
+          "ci95": [
+            0.0132341452205882,
+            0.036810661764705876
+          ],
+          "share_of_queries_better": 0.39246323529411764,
+          "share_of_queries_worse": 0.31893382352941174
+        }
+      }
+    }
+  },
+  "filtered": {
+    "n_queries_per_category": 200,
+    "categories": {
+      "License Grant": {
+        "group": "most_frequent",
+        "reference_rows": 599,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.9601464998922893,
+              "p95": 1.0149836492928443,
+              "p99": 1.8060226705892986,
+              "mean": 0.9793769149928266
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.76,
+              "p95": 0.78705,
+              "p99": 0.80708,
+              "mean": 0.7625749999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.24350000000000002,
+            "mean_result_count": 2.535,
+            "share_below_expected_count": 0.84,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5783539991170983,
+              "p95": 0.7088079993081918,
+              "p99": 0.8649569894987508,
+              "mean": 0.5784612749539519
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3145,
+              "p95": 0.4192499999999999,
+              "p99": 0.4661099999999999,
+              "mean": 0.30805
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.24350000000000002,
+            "mean_result_count": 2.535,
+            "share_below_expected_count": 0.84,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5504999999175197,
+              "p95": 0.6528898995384225,
+              "p99": 0.6716140786193135,
+              "mean": 0.5425542250213766
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3265,
+              "p95": 0.4450499999999993,
+              "p99": 0.5822099999999998,
+              "mean": 0.32243499999999997
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.97,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.5128954994215746,
+              "p95": 5.322698248619416,
+              "p99": 6.173909910485226,
+              "mean": 2.6748285299981944
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.367,
+              "p95": 5.146799999999995,
+              "p99": 6.8958499999999985,
+              "mean": 2.52686
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9215000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.84533350077254,
+              "p95": 6.397656249009741,
+              "p99": 7.905156251308585,
+              "mean": 3.199319424957139
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.56,
+              "p95": 5.4587,
+              "p99": 7.279949999999993,
+              "mean": 2.71543
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Anti-Assignment": {
+        "group": "most_frequent",
+        "reference_rows": 535,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.7380630004263367,
+              "p95": 0.7893795000200041,
+              "p99": 1.025934579665772,
+              "mean": 0.7501627249621379
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.5555000000000001,
+              "p95": 0.589,
+              "p99": 0.8381899999999998,
+              "mean": 0.566105
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.2635,
+            "mean_result_count": 2.71,
+            "share_below_expected_count": 0.845,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.563874499675876,
+              "p95": 0.759840249793342,
+              "p99": 0.8713747601359495,
+              "mean": 0.5674033300238079
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3135,
+              "p95": 0.4211,
+              "p99": 0.47405999999999904,
+              "mean": 0.30805
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.2635,
+            "mean_result_count": 2.71,
+            "share_below_expected_count": 0.845,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5546249994949903,
+              "p95": 0.6562982506693515,
+              "p99": 0.6913870793687237,
+              "mean": 0.5504074500368006
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.32,
+              "p95": 0.48539999999999983,
+              "p99": 0.5935599999999994,
+              "mean": 0.32123000000000007
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9655000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 1.7759374995875987,
+              "p95": 4.975821450170769,
+              "p99": 7.735994920967634,
+              "mean": 2.1022648050347925
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.3545,
+              "p95": 3.9476999999999998,
+              "p99": 6.171619999999998,
+              "mean": 1.6152449999999998
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.899,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 1.6324170001098537,
+              "p95": 4.4505159990876555,
+              "p99": 6.031855089968296,
+              "mean": 1.930981715067901
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.4460000000000002,
+              "p95": 4.147299999999996,
+              "p99": 5.627539999999996,
+              "mean": 1.70182
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Cap On Liability": {
+        "group": "most_frequent",
+        "reference_rows": 524,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.8176664996426553,
+              "p95": 0.8649461495224386,
+              "p99": 1.0134562498387814,
+              "mean": 0.8273520798957179
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.62,
+              "p95": 0.6969499999999996,
+              "p99": 0.9370200000000001,
+              "mean": 0.636215
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.17350000000000002,
+            "mean_result_count": 1.755,
+            "share_below_expected_count": 0.88,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5592914994849707,
+              "p95": 0.6551006497829803,
+              "p99": 0.6838437512305968,
+              "mean": 0.5526090000330441
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.328,
+              "p95": 0.476,
+              "p99": 0.5927199999999994,
+              "mean": 0.32706
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.17350000000000002,
+            "mean_result_count": 1.755,
+            "share_below_expected_count": 0.88,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5546459997276543,
+              "p95": 0.6416728997464815,
+              "p99": 0.6902116698074675,
+              "mean": 0.5479672399906121
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3035,
+              "p95": 0.41809999999999997,
+              "p99": 0.4714499999999996,
+              "mean": 0.30185
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9684999999999999,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.037520499470702,
+              "p95": 3.472853501079953,
+              "p99": 3.8663982501930136,
+              "mean": 2.0251314849974733
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.7345000000000002,
+              "p95": 3.2754499999999998,
+              "p99": 3.7311699999999988,
+              "mean": 1.75622
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.8960000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.086271000734996,
+              "p95": 3.892214249299286,
+              "p99": 4.194204761461149,
+              "mean": 2.1434110649806826
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.737,
+              "p95": 3.2666999999999997,
+              "p99": 3.7218199999999992,
+              "mean": 1.7827250000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Audit Rights": {
+        "group": "most_frequent",
+        "reference_rows": 487,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.7201039998108172,
+              "p95": 1.24848959967494,
+              "p99": 3.2513070805362063,
+              "mean": 0.8500371150239516
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.507,
+              "p95": 0.5382,
+              "p99": 0.6128499999999992,
+              "mean": 0.511785
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.11349999999999999,
+            "mean_result_count": 1.145,
+            "share_below_expected_count": 0.92,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5656664998241467,
+              "p95": 0.6892562505527167,
+              "p99": 0.7817782394704407,
+              "mean": 0.5617798200455582
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3115,
+              "p95": 0.41609999999999997,
+              "p99": 0.4771899999999998,
+              "mean": 0.304485
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.11349999999999999,
+            "mean_result_count": 1.145,
+            "share_below_expected_count": 0.92,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5515205002666335,
+              "p95": 0.6549997011461528,
+              "p99": 0.6801223301226855,
+              "mean": 0.5450660800215701
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.329,
+              "p95": 0.4403499999999999,
+              "p99": 0.5214899999999996,
+              "mean": 0.325345
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9780000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.0251669995777775,
+              "p95": 4.989079799543102,
+              "p99": 5.657905500338529,
+              "mean": 2.963579374945766
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.7755,
+              "p95": 4.855649999999998,
+              "p99": 5.5630299999999995,
+              "mean": 2.72592
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9250000000000002,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.0521039998347987,
+              "p95": 5.0870500004748465,
+              "p99": 5.6109167495196735,
+              "mean": 3.0174856549638207
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.8405,
+              "p95": 4.874249999999999,
+              "p99": 5.585919999999999,
+              "mean": 2.7720100000000003
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Insurance": {
+        "group": "most_frequent",
+        "reference_rows": 425,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.6155624996608822,
+              "p95": 0.6419920003281732,
+              "p99": 0.659773748666339,
+              "mean": 0.6176003700511501
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.414,
+              "p95": 0.42805,
+              "p99": 0.44802,
+              "mean": 0.41564999999999996
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.098,
+            "mean_result_count": 0.98,
+            "share_below_expected_count": 0.94,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.569478500437981,
+              "p95": 0.6666458501058514,
+              "p99": 0.7163299110106891,
+              "mean": 0.5590602099891839
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3035,
+              "p95": 0.40105,
+              "p99": 0.4340899999999999,
+              "mean": 0.29382
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.098,
+            "mean_result_count": 0.98,
+            "share_below_expected_count": 0.94,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5307080000420683,
+              "p95": 0.6183232014336681,
+              "p99": 0.6486441694505628,
+              "mean": 0.5225818299823004
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.287,
+              "p95": 0.3871,
+              "p99": 0.41601,
+              "mean": 0.28210500000000005
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9720000000000002,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.9486039993571467,
+              "p95": 5.68392885097637,
+              "p99": 6.535920419355528,
+              "mean": 3.0849672949898377
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.5854999999999997,
+              "p95": 5.3210999999999995,
+              "p99": 5.8402899999999995,
+              "mean": 2.72767
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.905,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.019249999852036,
+              "p95": 6.301245851136626,
+              "p99": 7.954419250290805,
+              "mean": 3.2675739650403557
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.5385,
+              "p95": 5.197849999999999,
+              "p99": 5.695419999999999,
+              "mean": 2.698995
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Expiration Date": {
+        "group": "most_frequent",
+        "reference_rows": 373,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5474165000123321,
+              "p95": 0.5759124995165621,
+              "p99": 0.6283433297721782,
+              "mean": 0.5504943900086801
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.339,
+              "p95": 0.35505,
+              "p99": 0.36301,
+              "mean": 0.34384
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.1725,
+            "mean_result_count": 1.765,
+            "share_below_expected_count": 0.9,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5600419999609585,
+              "p95": 0.6832250011029827,
+              "p99": 0.7458154203959562,
+              "mean": 0.5558299749372964
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3265,
+              "p95": 0.4321499999999999,
+              "p99": 0.4835599999999995,
+              "mean": 0.31642000000000003
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.1725,
+            "mean_result_count": 1.765,
+            "share_below_expected_count": 0.9,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5437504996734788,
+              "p95": 0.6399267488632177,
+              "p99": 0.6779008302328292,
+              "mean": 0.539740804961184
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3145,
+              "p95": 0.4141999999999999,
+              "p99": 0.45109999999999995,
+              "mean": 0.30513999999999997
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9434999999999999,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.2040000005508773,
+              "p95": 6.834768399494347,
+              "p99": 7.727319591522237,
+              "mean": 3.2966172850410658
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.8965,
+              "p95": 6.35475,
+              "p99": 7.36600999999999,
+              "mean": 3.0135300000000003
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.8865000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.1195000001389417,
+              "p95": 6.7430743495606285,
+              "p99": 7.817032420625761,
+              "mean": 3.2536431250173337
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 2.9715,
+              "p95": 6.980999999999999,
+              "p99": 8.190379999999992,
+              "mean": 3.07248
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Governing Law": {
+        "group": "most_frequent",
+        "reference_rows": 373,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5448540005090763,
+              "p95": 0.6232836502931604,
+              "p99": 0.7587599984435627,
+              "mean": 0.5561787550232111
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.313,
+              "p95": 0.3331,
+              "p99": 0.4074499999999996,
+              "mean": 0.31648
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 0.065,
+            "mean_result_count": 0.655,
+            "share_below_expected_count": 0.94,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5642910000460688,
+              "p95": 0.7913312487289659,
+              "p99": 1.0174404199096878,
+              "mean": 0.5758603899721493
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3075,
+              "p95": 0.4131999999999999,
+              "p99": 0.4651199999999999,
+              "mean": 0.301495
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.065,
+            "mean_result_count": 0.655,
+            "share_below_expected_count": 0.94,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5467920000228332,
+              "p95": 0.6523916498736071,
+              "p99": 0.6818532484612659,
+              "mean": 0.5416456400234892
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3175,
+              "p95": 0.4782999999999999,
+              "p99": 0.561309999999998,
+              "mean": 0.32084
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9205000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 4.028354000183754,
+              "p95": 7.937113950265484,
+              "p99": 8.985280410415724,
+              "mean": 4.140101060047527
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 3.832,
+              "p95": 7.303499999999998,
+              "p99": 8.774869999999998,
+              "mean": 3.93398
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.7755000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 4.17218749953463,
+              "p95": 7.3077818496130895,
+              "p99": 9.026463509835594,
+              "mean": 4.201216449982894
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 3.9154999999999998,
+              "p95": 7.870499999999998,
+              "p99": 9.316099999999999,
+              "mean": 4.05522
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Post-Termination Services": {
+        "group": "most_frequent",
+        "reference_rows": 337,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.6468120000135968,
+              "p95": 0.66845414976342,
+              "p99": 0.67571176092315,
+              "mean": 0.6479751850019966
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.4355,
+              "p95": 0.452,
+              "p99": 0.463,
+              "mean": 0.43711
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.6702085001961677,
+              "p95": 1.0646597991581073,
+              "p99": 1.2904374112076755,
+              "mean": 0.7614397799170547
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.447,
+              "p95": 0.4931,
+              "p99": 0.6884099999999987,
+              "mean": 0.45502
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.16899999999999998,
+            "mean_result_count": 1.705,
+            "share_below_expected_count": 0.945,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5891040000278736,
+              "p95": 0.8000396004717911,
+              "p99": 1.103046079733756,
+              "mean": 0.6052439949417021
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.305,
+              "p95": 0.4043499999999999,
+              "p99": 0.4491999999999998,
+              "mean": 0.30062
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.977,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 1.9870625001203734,
+              "p95": 3.583910100405774,
+              "p99": 3.9070466702469275,
+              "mean": 1.9992325199928018
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.767,
+              "p95": 3.4877999999999996,
+              "p99": 3.7936699999999974,
+              "mean": 1.81583
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.934,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.004541500355117,
+              "p95": 3.633356599402759,
+              "p99": 4.020169251343756,
+              "mean": 2.077382264978951
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 1.7985,
+              "p95": 3.461299999999999,
+              "p99": 3.703439999999995,
+              "mean": 1.8364699999999998
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Minimum Commitment": {
+        "group": "most_frequent",
+        "reference_rows": 334,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5563540007642587,
+              "p95": 0.5766312497144099,
+              "p99": 0.5840905885088431,
+              "mean": 0.5578214350043709
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.343,
+              "p95": 0.3591,
+              "p99": 0.37002999999999997,
+              "mean": 0.347565
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5512090010597603,
+              "p95": 0.5708003008294327,
+              "p99": 0.5875135096903249,
+              "mean": 0.5521712550125812
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.343,
+              "p95": 0.36,
+              "p99": 0.3771299999999999,
+              "mean": 0.34719500000000003
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.102,
+            "mean_result_count": 1.02,
+            "share_below_expected_count": 0.965,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5623540009764838,
+              "p95": 0.673914600702119,
+              "p99": 0.715088160104642,
+              "mean": 0.5551573150387412
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.327,
+              "p95": 0.4694999999999992,
+              "p99": 0.5872099999999998,
+              "mean": 0.326765
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9840000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 2.9755210007351707,
+              "p95": 5.442933349695522,
+              "p99": 5.8885209204709055,
+              "mean": 3.1491189650205342
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 3.3005,
+              "p95": 6.657999999999988,
+              "p99": 8.497199999999994,
+              "mean": 3.476225
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9445000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 3.249916500863037,
+              "p95": 6.123658649721618,
+              "p99": 6.9614337500388475,
+              "mean": 3.444483975035837
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 3.3550000000000004,
+              "p95": 6.339300000000001,
+              "p99": 7.96955,
+              "mean": 3.47739
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Revenue/Profit Sharing": {
+        "group": "most_frequent",
+        "reference_rows": 331,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5769999997937703,
+              "p95": 0.8337940489582252,
+              "p99": 0.9875731608190091,
+              "mean": 0.6115425250300177
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3865,
+              "p95": 0.6964499999999981,
+              "p99": 0.958159999999998,
+              "mean": 0.44303
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5940000000919099,
+              "p95": 0.7139118497434538,
+              "p99": 0.9290971689551916,
+              "mean": 0.6202497800222773
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.356,
+              "p95": 0.381,
+              "p99": 0.40725999999999973,
+              "mean": 0.3584399999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0925,
+            "mean_result_count": 0.93,
+            "share_below_expected_count": 0.94,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.8233329999711714,
+              "p95": 1.3524146001145698,
+              "p99": 1.6669810794155633,
+              "mean": 0.8711941449655569
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.502,
+              "p95": 0.8908499999999994,
+              "p99": 1.099119999999999,
+              "mean": 0.536205
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9865,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.948770500253886,
+              "p95": 16.44842080058878,
+              "p99": 66.34116616085508,
+              "mean": 7.81426895997356
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.312,
+              "p95": 9.204899999999991,
+              "p99": 12.477019999999998,
+              "mean": 4.415375
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9530000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 4.659374500079139,
+              "p95": 8.138429149403237,
+              "p99": 9.213337921119086,
+              "mean": 4.6139966650753195
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.8375,
+              "p95": 10.4192,
+              "p99": 11.93890999999998,
+              "mean": 5.0895600000000005
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "No-Solicit Of Employees": {
+        "group": "least_frequent",
+        "reference_rows": 77,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3466045000095619,
+              "p95": 0.37673334927603713,
+              "p99": 0.38575190959818423,
+              "mean": 0.34978668002622726
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.112,
+              "p95": 0.125,
+              "p99": 0.12702,
+              "mean": 0.11397000000000002
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3438125004322501,
+              "p95": 0.36425239914024127,
+              "p99": 0.38963258955845953,
+              "mean": 0.3458912149471871
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.112,
+              "p95": 0.126,
+              "p99": 0.131,
+              "mean": 0.114375
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.019,
+            "mean_result_count": 0.19,
+            "share_below_expected_count": 0.995,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5522289993677987,
+              "p95": 0.6756089503141992,
+              "p99": 0.7831768408504974,
+              "mean": 0.5554427099104942
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.332,
+              "p95": 0.46405,
+              "p99": 0.5554499999999997,
+              "mean": 0.32658000000000004
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.996,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 4.7395830015375395,
+              "p95": 8.570956250423476,
+              "p99": 10.466098919623613,
+              "mean": 5.021134990120117
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.6259999999999994,
+              "p95": 7.886899999999999,
+              "p99": 9.25572999999999,
+              "mean": 4.713185
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9780000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 4.958228999385028,
+              "p95": 8.44650384951819,
+              "p99": 10.689717169407231,
+              "mean": 5.1818375349557755
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.362,
+              "p95": 7.087749999999999,
+              "p99": 8.213899999999995,
+              "mean": 4.340525
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Liquidated Damages": {
+        "group": "least_frequent",
+        "reference_rows": 73,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.33187499957421096,
+              "p95": 0.36088124943489674,
+              "p99": 0.3739500896881508,
+              "mean": 0.3356733400505618
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.1075,
+              "p95": 0.1762999999999999,
+              "p99": 1.1263099999999961,
+              "mean": 0.14143
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3300834996480262,
+              "p95": 0.35254795102446224,
+              "p99": 0.37779083053464996,
+              "mean": 0.3320370450273913
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.1,
+              "p95": 0.113,
+              "p99": 0.11501999999999998,
+              "mean": 0.10131499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.044000000000000004,
+            "mean_result_count": 0.44,
+            "share_below_expected_count": 0.98,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5528124993361416,
+              "p95": 0.6540329990457394,
+              "p99": 0.6730699995023313,
+              "mean": 0.5437005900239456
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.2955,
+              "p95": 0.4,
+              "p99": 0.4571199999999999,
+              "mean": 0.289325
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.995,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.233396000221546,
+              "p95": 9.122783349539528,
+              "p99": 9.777425089814638,
+              "mean": 5.1731641849892185
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.856999999999999,
+              "p95": 9.1982,
+              "p99": 10.143469999999992,
+              "mean": 5.0083899999999995
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9719999999999999,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.233458000475366,
+              "p95": 9.526029149674287,
+              "p99": 10.127450499985567,
+              "mean": 5.327937950087289
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.720000000000001,
+              "p95": 8.699449999999997,
+              "p99": 9.809409999999998,
+              "mean": 4.8156
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Non-Disparagement": {
+        "group": "least_frequent",
+        "reference_rows": 57,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.30200049968698295,
+              "p95": 0.3880999991451968,
+              "p99": 0.5064641584976921,
+              "mean": 0.3148987649819901
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.065,
+              "p95": 0.08509999999999997,
+              "p99": 0.15630999999999973,
+              "mean": 0.07073499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.31622900041838875,
+              "p95": 0.45010209960310016,
+              "p99": 0.5556537498523539,
+              "mean": 0.33385416999408335
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.064,
+              "p95": 0.079,
+              "p99": 0.09000999999999999,
+              "mean": 0.06699
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.019500000000000003,
+            "mean_result_count": 0.195,
+            "share_below_expected_count": 0.995,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5740415008403943,
+              "p95": 0.7281642493580872,
+              "p99": 0.868984250755602,
+              "mean": 0.5835850399762421
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.33,
+              "p95": 0.44849999999999984,
+              "p99": 0.6073899999999997,
+              "mean": 0.32378
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9980000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.95387499924982,
+              "p95": 9.601050000492247,
+              "p99": 10.535621989656645,
+              "mean": 6.171313304957948
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 5.900499999999999,
+              "p95": 10.11915,
+              "p99": 11.502839999999999,
+              "mean": 6.1750300000000005
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9835,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 7.289833499271481,
+              "p95": 11.814856249657169,
+              "p99": 13.700275830815361,
+              "mean": 7.63277647997711
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 6.5395,
+              "p95": 11.18535,
+              "p99": 12.94272,
+              "mean": 6.8958699999999995
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "No-Solicit Of Customers": {
+        "group": "least_frequent",
+        "reference_rows": 53,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.31506250070378883,
+              "p95": 0.3719125003954104,
+              "p99": 0.4282751693244786,
+              "mean": 0.3235658500670979
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.068,
+              "p95": 0.08504999999999999,
+              "p99": 0.09709999999999991,
+              "mean": 0.071995
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3081459990426083,
+              "p95": 0.33910269930856884,
+              "p99": 0.36982608049584065,
+              "mean": 0.31147457999395556
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.081,
+              "p95": 0.157,
+              "p99": 0.2411999999999998,
+              "mean": 0.09122999999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0245,
+            "mean_result_count": 0.245,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.646417000098154,
+              "p95": 0.8888079985808872,
+              "p99": 1.0081291600545224,
+              "mean": 0.6553122899640584
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.357,
+              "p95": 0.50905,
+              "p99": 0.6273799999999996,
+              "mean": 0.3552850000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9954999999999999,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.737958001191146,
+              "p95": 9.0640124994934,
+              "p99": 12.234275741157031,
+              "mean": 5.714537454960009
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 4.941,
+              "p95": 7.501999999999999,
+              "p99": 9.328559999999998,
+              "mean": 4.94508
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9765,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 5.578374999458902,
+              "p95": 8.590077048756937,
+              "p99": 12.334598328452524,
+              "mean": 5.809722759995566
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 5.452,
+              "p95": 8.830099999999998,
+              "p99": 10.32146999999999,
+              "mean": 5.595694999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Affiliate License-Licensor": {
+        "group": "least_frequent",
+        "reference_rows": 49,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.31985400073608616,
+              "p95": 0.37062849996800645,
+              "p99": 0.43362166028600746,
+              "mean": 0.32511419995898905
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.083,
+              "p95": 0.09704999999999998,
+              "p99": 0.11369999999999937,
+              "mean": 0.08673499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3174165012751473,
+              "p95": 0.3421610511395556,
+              "p99": 0.38200766830414046,
+              "mean": 0.32037587513514154
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.088,
+              "p95": 0.09904999999999999,
+              "p99": 0.10701999999999998,
+              "mean": 0.08840500000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0375,
+            "mean_result_count": 0.375,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5828535004184232,
+              "p95": 0.7699997000599978,
+              "p99": 0.9396028301125622,
+              "mean": 0.5954085550183663
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3475,
+              "p95": 0.49605,
+              "p99": 0.63408,
+              "mean": 0.34338
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9975,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 6.256146000851004,
+              "p95": 10.025108299669228,
+              "p99": 10.791909169583958,
+              "mean": 6.089197895062171
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 6.221,
+              "p95": 9.89425,
+              "p99": 10.88744,
+              "mean": 5.910035000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9715,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 6.655041999692912,
+              "p95": 10.283712200634909,
+              "p99": 11.497425919915255,
+              "mean": 6.331379754992668
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 6.234500000000001,
+              "p95": 10.233149999999998,
+              "p99": 11.104089999999992,
+              "mean": 6.158565000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Source Code Escrow": {
+        "group": "least_frequent",
+        "reference_rows": 36,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3017295002791798,
+              "p95": 0.7153183995797006,
+              "p99": 1.260487580275366,
+              "mean": 0.3792149850869464
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.043,
+              "p95": 0.06004999999999998,
+              "p99": 0.09405999999999995,
+              "mean": 0.046189999999999995
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.2765415010799188,
+              "p95": 0.2966458511764358,
+              "p99": 0.3083417502057272,
+              "mean": 0.27860394996423565
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.042,
+              "p95": 0.04704999999999998,
+              "p99": 0.056,
+              "mean": 0.043035
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.018,
+            "mean_result_count": 0.18,
+            "share_below_expected_count": 0.995,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5404375006037299,
+              "p95": 0.6387913510479848,
+              "p99": 0.6705468396285141,
+              "mean": 0.5335712699434225
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.2965,
+              "p95": 0.38805,
+              "p99": 0.42405999999999994,
+              "mean": 0.28821
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 6.684666999717592,
+              "p95": 9.52944375012521,
+              "p99": 10.64522274082263,
+              "mean": 6.606774189986027
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 6.511,
+              "p95": 8.806499999999998,
+              "p99": 10.099829999999999,
+              "mean": 6.33876
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.978,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 6.908437499987485,
+              "p95": 9.853344350085536,
+              "p99": 11.18945190981321,
+              "mean": 6.80956707000405
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 6.323499999999999,
+              "p95": 9.309049999999997,
+              "p99": 9.862679999999997,
+              "mean": 6.265325000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Third Party Beneficiary": {
+        "group": "least_frequent",
+        "reference_rows": 30,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.29377049941103905,
+              "p95": 0.831247600126516,
+              "p99": 1.611211580475349,
+              "mean": 0.3892043449286575
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.041,
+              "p95": 0.084,
+              "p99": 0.16005999999999995,
+              "mean": 0.04692499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.3502710005705012,
+              "p95": 0.5945684488324331,
+              "p99": 0.6945604999236817,
+              "mean": 0.38813207485873136
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.038,
+              "p95": 0.05839999999999987,
+              "p99": 0.08512999999999989,
+              "mean": 0.04297499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0055000000000000005,
+            "mean_result_count": 0.055,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5628329990940983,
+              "p95": 0.684574699243967,
+              "p99": 0.7561451794754247,
+              "mean": 0.5587141399610118
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3305,
+              "p95": 0.4676499999999998,
+              "p99": 0.5353099999999997,
+              "mean": 0.3323
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9990000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 7.2899790002338705,
+              "p95": 13.710387799619637,
+              "p99": 18.32875124968267,
+              "mean": 7.662654189962268
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 5.719,
+              "p95": 10.272899999999998,
+              "p99": 13.037460000000001,
+              "mean": 5.989484999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9880000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 6.421125000088068,
+              "p95": 11.919444049726733,
+              "p99": 13.757574169794674,
+              "mean": 6.625593760072661
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 5.7425,
+              "p95": 10.185649999999994,
+              "p99": 12.764879999999998,
+              "mean": 5.963695
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Most Favored Nation": {
+        "group": "least_frequent",
+        "reference_rows": 28,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.2807499995469698,
+              "p95": 0.30001524964973214,
+              "p99": 0.3098507498361868,
+              "mean": 0.282231294995654
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.046,
+              "p95": 0.05409999999999997,
+              "p99": 0.06000999999999999,
+              "mean": 0.04722
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.282521001281566,
+              "p95": 0.3116243499789561,
+              "p99": 0.32716508021621843,
+              "mean": 0.2858737699989433
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.046,
+              "p95": 0.058049999999999984,
+              "p99": 0.06,
+              "mean": 0.047355
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.013500000000000002,
+            "mean_result_count": 0.135,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5640414992740261,
+              "p95": 0.6941940499018528,
+              "p99": 0.7348087513491919,
+              "mean": 0.5599260400231287
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3065,
+              "p95": 0.40704999999999997,
+              "p99": 0.44324999999999976,
+              "mean": 0.29823500000000003
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 0.995,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 7.47454199972708,
+              "p95": 10.229501751291535,
+              "p99": 11.303191668575886,
+              "mean": 7.48146647001704
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 7.1575,
+              "p95": 9.71045,
+              "p99": 10.818,
+              "mean": 7.156195
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9740000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 7.469978999324667,
+              "p95": 10.004243098956067,
+              "p99": 11.299876431512528,
+              "mean": 7.497334165036591
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 7.4875,
+              "p95": 9.828349999999997,
+              "p99": 11.501559999999998,
+              "mean": 7.420615000000001
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Unlimited/All-You-Can-Eat-License": {
+        "group": "least_frequent",
+        "reference_rows": 28,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.28049999946233584,
+              "p95": 0.30447049903159495,
+              "p99": 0.32016934015700826,
+              "mean": 0.2832794199093769
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.041,
+              "p95": 0.05304999999999998,
+              "p99": 0.05601999999999998,
+              "mean": 0.042295
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.2781040002446389,
+              "p95": 0.3068937509851821,
+              "p99": 0.3148618392515345,
+              "mean": 0.2803727200443973
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.041,
+              "p95": 0.04809999999999997,
+              "p99": 0.05600999999999999,
+              "mean": 0.04192499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0125,
+            "mean_result_count": 0.125,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5610624994005775,
+              "p95": 0.6620473003749794,
+              "p99": 0.7073019093149923,
+              "mean": 0.5530042000464164
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.3125,
+              "p95": 0.41305,
+              "p99": 0.45701,
+              "mean": 0.304345
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 11.021729001186031,
+              "p95": 13.792559800640445,
+              "p99": 14.80954791068143,
+              "mean": 10.02283021493895
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 10.289000000000001,
+              "p95": 12.781799999999999,
+              "p99": 13.45814,
+              "mean": 9.272235
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9940000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 10.196500000347442,
+              "p95": 13.151904799815382,
+              "p99": 13.861114500687108,
+              "mean": 9.269033340069655
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 9.9185,
+              "p95": 12.498199999999999,
+              "p99": 14.005999999999991,
+              "mean": 9.021115
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      },
+      "Price Restrictions": {
+        "group": "least_frequent",
+        "reference_rows": 27,
+        "modes": {
+          "exact_filtered_gin": {
+            "settings": {
+              "enable_indexscan": "off",
+              "enable_seqscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.27818750004371395,
+              "p95": 0.3098812486314273,
+              "p99": 0.3347367509559261,
+              "mean": 0.2821258451058384
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.038,
+              "p95": 0.04204999999999998,
+              "p99": 0.05000999999999999,
+              "mean": 0.03821499999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "planner_default": {
+            "settings": {
+              "hnsw__ef_search": 40
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.2737909999268595,
+              "p95": 0.2937455507890263,
+              "p99": 0.3097497484486666,
+              "mean": 0.27527832997293444
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.037,
+              "p95": 0.039,
+              "p99": 0.04603999999999996,
+              "mean": 0.03754999999999999
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_categories"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Sort",
+                  "Bitmap Heap Scan",
+                  "Bitmap Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": false,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off"
+            },
+            "recall@10_vs_exact_filtered": 0.0055000000000000005,
+            "mean_result_count": 0.055,
+            "share_below_expected_count": 1.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 0.5462294993776595,
+              "p95": 0.6456895994233491,
+              "p99": 0.6760037514686701,
+              "mean": 0.5401251750390657
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 0.299,
+              "p95": 0.39419999999999994,
+              "p99": 0.43503,
+              "mean": 0.291085
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_relaxed_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "relaxed_order"
+            },
+            "recall@10_vs_exact_filtered": 1.0,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 10.98145849937282,
+              "p95": 13.946210099584277,
+              "p99": 14.186811579238555,
+              "mean": 10.24378766501286
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 11.0015,
+              "p95": 13.34905,
+              "p99": 14.065,
+              "mean": 9.888465
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          },
+          "hnsw_forced_iterative_strict_order": {
+            "settings": {
+              "hnsw__ef_search": 40,
+              "enable_seqscan": "off",
+              "enable_bitmapscan": "off",
+              "hnsw__iterative_scan": "strict_order"
+            },
+            "recall@10_vs_exact_filtered": 0.9940000000000001,
+            "mean_result_count": 10.0,
+            "share_below_expected_count": 0.0,
+            "expected_count": 10,
+            "client_ms": {
+              "n": 200,
+              "p50": 11.439708499892731,
+              "p95": 14.344016350423768,
+              "p99": 16.790095590222336,
+              "mean": 10.54155855508725
+            },
+            "server_execution_ms": {
+              "n": 200,
+              "p50": 11.8825,
+              "p95": 15.733449999999994,
+              "p99": 24.422449999999984,
+              "mean": 11.32902
+            },
+            "plans": [
+              {
+                "indexes": [
+                  "ix_reference_clauses_embedding_hnsw"
+                ],
+                "nodes": [
+                  "Limit",
+                  "Index Scan"
+                ],
+                "seq_scan": false,
+                "uses_hnsw": true,
+                "uses_ivfflat": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "note": "Measured on the current index (rebuilt by part B of the original run), not the index Part A used.",
+    "hnsw_ef_search": 50,
+    "queries_returning_fewer_than_50": [],
+    "reference_clauses_stats": {
+      "n_live_tup": 6604,
+      "n_dead_tup": 0,
+      "last_vacuum": "None",
+      "last_autovacuum": "2026-10-01 17:59:31.500322+00:00",
+      "last_analyze": "2026-10-01 17:58:36.094674+00:00",
+      "last_autoanalyze": "2026-10-01 16:39:45.304098+00:00"
+    }
+  }
+}

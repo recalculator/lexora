@@ -6,6 +6,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from typing import Callable
 import logging
+from app.core.config import settings
+
+# Route stdlib logging (which structlog renders through) at LOG_LEVEL
+logging.basicConfig(format="%(message)s", level=getattr(logging, settings.log_level.upper(), logging.INFO))
 
 # Configure structlog
 structlog.configure(

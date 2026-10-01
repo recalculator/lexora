@@ -1,0 +1,398 @@
+{
+  "environment": {
+    "env": "local",
+    "timestamp_utc": "2026-10-01T19:31:55.856617+00:00",
+    "dry_run": false,
+    "postgres_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+    "postgres_server_version_num": "160015",
+    "pgvector_version": "0.8.6",
+    "db_host": "postgres",
+    "db_ssl": false,
+    "host_description": "local Docker",
+    "azure_sku": null,
+    "server_settings": {
+      "shared_buffers": "128MB",
+      "work_mem": "4MB",
+      "maintenance_work_mem": "64MB",
+      "effective_cache_size": "4GB",
+      "max_parallel_workers_per_gather": "2",
+      "max_parallel_maintenance_workers": "2",
+      "hnsw.ef_search": "40",
+      "hnsw.iterative_scan": "off",
+      "hnsw.max_scan_tuples": "20000",
+      "ivfflat.probes": "1"
+    },
+    "client": {
+      "platform": "Linux-7.0.12-linuxkit-aarch64-with-glibc2.41",
+      "python": "3.11.16",
+      "cpu_count_visible": 10,
+      "cpu_model_container": null,
+      "host_cpu": "Apple M5",
+      "docker_resources": "10 CPUs, 8319504384 bytes memory"
+    },
+    "corpus": {
+      "reference_rows": 6766,
+      "eval_rows": 1924,
+      "corpus_meta_sha256": "66061f04f0daf7f29ec29d0ef9443813782bbe1d00ab71b02464379766247483",
+      "split_sha256": "fe5abcc46adffe9f01512ef6c2ba1dce2599902a8e43ea66dda252710323be1f"
+    },
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "seed": 42,
+    "git": {
+      "commit": "bd2575ae03616ee6de51d8b78750753152fe3cc3",
+      "dirty_files": 0,
+      "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "hnsw_index_size_bytes": 13762560,
+  "sample_size": 100,
+  "seed": 42,
+  "top_k": 3,
+  "app_clause_types": [
+    "Termination",
+    "Indemnification",
+    "Liability Cap",
+    "Confidentiality",
+    "Insurance",
+    "Intellectual Property",
+    "Assignment",
+    "Governing Law"
+  ],
+  "fix_off": {
+    "session_settings": {
+      "hnsw.ef_search": "40",
+      "hnsw.iterative_scan": "off"
+    },
+    "types": {
+      "Termination": {
+        "filtered": true,
+        "cuad_categories": [
+          "Termination For Convenience",
+          "Notice Period To Terminate Renewal",
+          "Post-Termination Services"
+        ],
+        "matching_reference_rows": 622,
+        "mean_returned": 1.18,
+        "queries_below_top_k": 74,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Indemnification": {
+        "filtered": false,
+        "cuad_categories": null,
+        "matching_reference_rows": 6766,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Liability Cap": {
+        "filtered": true,
+        "cuad_categories": [
+          "Cap On Liability",
+          "Uncapped Liability"
+        ],
+        "matching_reference_rows": 555,
+        "mean_returned": 0.98,
+        "queries_below_top_k": 78,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Confidentiality": {
+        "filtered": false,
+        "cuad_categories": null,
+        "matching_reference_rows": 6766,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Insurance": {
+        "filtered": true,
+        "cuad_categories": [
+          "Insurance"
+        ],
+        "matching_reference_rows": 425,
+        "mean_returned": 0.49,
+        "queries_below_top_k": 90,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Intellectual Property": {
+        "filtered": true,
+        "cuad_categories": [
+          "Ip Ownership Assignment",
+          "Joint Ip Ownership",
+          "License Grant"
+        ],
+        "matching_reference_rows": 931,
+        "mean_returned": 1.18,
+        "queries_below_top_k": 67,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Assignment": {
+        "filtered": true,
+        "cuad_categories": [
+          "Anti-Assignment",
+          "Change Of Control"
+        ],
+        "matching_reference_rows": 713,
+        "mean_returned": 1.48,
+        "queries_below_top_k": 58,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Governing Law": {
+        "filtered": true,
+        "cuad_categories": [
+          "Governing Law"
+        ],
+        "matching_reference_rows": 373,
+        "mean_returned": 0.2,
+        "queries_below_top_k": 96,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      }
+    }
+  },
+  "fix_on": {
+    "session_settings": {
+      "hnsw.ef_search": "40",
+      "hnsw.iterative_scan": "off"
+    },
+    "types": {
+      "Termination": {
+        "filtered": true,
+        "cuad_categories": [
+          "Termination For Convenience",
+          "Notice Period To Terminate Renewal",
+          "Post-Termination Services"
+        ],
+        "matching_reference_rows": 622,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      },
+      "Indemnification": {
+        "filtered": false,
+        "cuad_categories": null,
+        "matching_reference_rows": 6766,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Liability Cap": {
+        "filtered": true,
+        "cuad_categories": [
+          "Cap On Liability",
+          "Uncapped Liability"
+        ],
+        "matching_reference_rows": 555,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      },
+      "Confidentiality": {
+        "filtered": false,
+        "cuad_categories": null,
+        "matching_reference_rows": 6766,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_embedding_hnsw"
+          ]
+        }
+      },
+      "Insurance": {
+        "filtered": true,
+        "cuad_categories": [
+          "Insurance"
+        ],
+        "matching_reference_rows": 425,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      },
+      "Intellectual Property": {
+        "filtered": true,
+        "cuad_categories": [
+          "Ip Ownership Assignment",
+          "Joint Ip Ownership",
+          "License Grant"
+        ],
+        "matching_reference_rows": 931,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      },
+      "Assignment": {
+        "filtered": true,
+        "cuad_categories": [
+          "Anti-Assignment",
+          "Change Of Control"
+        ],
+        "matching_reference_rows": 713,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      },
+      "Governing Law": {
+        "filtered": true,
+        "cuad_categories": [
+          "Governing Law"
+        ],
+        "matching_reference_rows": 373,
+        "mean_returned": 3.0,
+        "queries_below_top_k": 0,
+        "queries": 100,
+        "plan_first_query": {
+          "nodes": [
+            "Limit",
+            "Sort",
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ],
+          "indexes": [
+            "ix_reference_clauses_categories"
+          ]
+        }
+      }
+    }
+  }
+}

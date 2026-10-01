@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg16
     container_name: lexora_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-lexora}
@@ -39,7 +39,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://lexora:lexora123@postgres:5432/lexora}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://lexora:lexora123@postgres:5432/lexora?sslmode=disable}  # local container has no SSL; Azure/Railway keep sslmode=require
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       # OPENAI_API_KEY and OPENAI_API_BASE loaded from .env via env_file
       MODEL_PATH: /app/models/clause_risknet.onnx

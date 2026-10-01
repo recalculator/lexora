@@ -18,3 +18,9 @@ httpx==0.25.2
 python-jose[cryptography]==3.3.0
 python-dotenv==1.0.0
 structlog==23.2.0
+
+# Retrieval (torch is installed CPU-only in the Dockerfile before this file)
+sentence-transformers==3.3.1
+transformers==4.57.6
+huggingface_hub==0.36.2
+pgvector==0.4.2

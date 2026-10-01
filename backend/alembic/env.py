@@ -11,12 +11,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.db.models import Base
 from app.core.config import settings
+from app.db.url import escape_for_alembic_config
 
 # this is the Alembic Config object
 config = context.config
 
-# Override sqlalchemy.url with settings
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Override sqlalchemy.url with settings (% escaped for configparser interpolation)
+config.set_main_option("sqlalchemy.url", escape_for_alembic_config(settings.database_url))
 
 # Interpret the config file for Python logging.
 if config.config_file_name is not None:

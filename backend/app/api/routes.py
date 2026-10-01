@@ -1,6 +1,7 @@
 """API routes."""
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse, FileResponse
+from sqlalchemy import insert
 from sqlalchemy.orm import Session
 from typing import Dict, List, Optional
 from pathlib import Path
@@ -15,6 +16,7 @@ from app.services.clause_segment import segment_clauses
 from app.services.onnx_infer import get_onnx_service, CLAUSE_TYPES
 from app.services.playbook import generate_playbook
 from app.services.redlines import generate_redlines
+from app.services.retrieval import get_embedder
 from app.services.explain import explain_clause as explain_clause_func, ClauseExplanationResponse
 from app.core.config import settings
 from app.core.logging import get_logger
@@ -135,24 +137,34 @@ async def analyze_document(
         
         for clause in clauses:
             classification = onnx_service.classify_clause(clause["text"])
-            
-            db_clause = Clause(
-                document_id=document_id,
-                idx=clause["idx"],
-                text=clause["text"],
-                start_char=clause["start_char"],
-                end_char=clause["end_char"],
-                clause_type=classification["clause_type"],
-                risk_score=classification["risk_score"],
-                confidence=classification["confidence"],
-            )
-            db.add(db_clause)
-            
             classified_clauses.append({
                 **clause,
                 **classification,
             })
         
+        # Embed all clauses in one batch (None if the embedder is unavailable)
+        embedder = get_embedder()
+        embeddings = embedder.encode([c["text"] for c in clauses]) if embedder and clauses else None
+        if embeddings is None:
+            logger.warning("Storing clauses without embeddings", document_id=document_id)
+        
+        # Single batched INSERT for all clauses
+        rows = [
+            {
+                "document_id": document_id,
+                "idx": c["idx"],
+                "text": c["text"],
+                "start_char": c["start_char"],
+                "end_char": c["end_char"],
+                "clause_type": c["clause_type"],
+                "risk_score": c["risk_score"],
+                "confidence": c["confidence"],
+                "embedding": embeddings[i] if embeddings is not None else None,
+            }
+            for i, c in enumerate(classified_clauses)
+        ]
+        if rows:
+            db.execute(insert(Clause), rows)
         db.commit()
         
         logger.info("Document analyzed", document_id=document_id, num_clauses=len(classified_clauses), model_status=model_status)
@@ -213,7 +225,7 @@ async def generate_playbook_endpoint(
         ]
         
         # Generate playbook
-        playbook = generate_playbook(clauses_dict, doc_text.text, document_id=document_id)
+        playbook = generate_playbook(clauses_dict, doc_text.text, document_id=document_id, db=db)
         
         # Store playbook
         db_playbook = Playbook(
@@ -275,7 +287,7 @@ async def generate_redlines_endpoint(
         ]
         
         # Generate redlines
-        redlines = generate_redlines(clauses_dict, doc_text.text, document_id=document_id)
+        redlines = generate_redlines(clauses_dict, doc_text.text, document_id=document_id, db=db)
         
         # Store redlines
         db_redlines = Redlines(

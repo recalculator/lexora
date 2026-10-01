@@ -1,8 +1,12 @@
 """Database models."""
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, JSON, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import relationship, deferred
+from pgvector.sqlalchemy import Vector
 from datetime import datetime
+
+EMBEDDING_DIM = 384
 
 Base = declarative_base()
 
@@ -42,7 +46,7 @@ class Clause(Base):
     __tablename__ = "clauses"
     
     id = Column(Integer, primary_key=True, index=True)
-    document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
+    document_id = Column(Integer, ForeignKey("documents.id"), nullable=False, index=True)
     idx = Column(Integer, nullable=False)  # Clause index within document
     text = Column(Text, nullable=False)
     start_char = Column(Integer, nullable=False)
@@ -50,9 +54,22 @@ class Clause(Base):
     clause_type = Column(String(100), nullable=True)  # e.g., "Termination", "Indemnification"
     risk_score = Column(Float, nullable=True)  # 0-100
     confidence = Column(Float, nullable=True)  # 0-1
-    
+    embedding = deferred(Column(Vector(EMBEDDING_DIM), nullable=True))  # Normalized MiniLM embedding
+
     # Relationships
     document = relationship("Document", back_populates="clauses")
+
+
+class ReferenceClause(Base):
+    """Precedent clause from a reference corpus (e.g. CUAD)."""
+    __tablename__ = "reference_clauses"
+
+    id = Column(Integer, primary_key=True)
+    source_contract = Column(String(512), nullable=False)
+    # All CUAD categories of this text (GIN-indexed varchar[] on Postgres; JSON on SQLite test DBs)
+    categories = Column(ARRAY(String(100)).with_variant(JSON(), "sqlite"), nullable=False)
+    text = Column(Text, nullable=False)
+    embedding = deferred(Column(Vector(EMBEDDING_DIM), nullable=False))
 
 
 class Playbook(Base):
