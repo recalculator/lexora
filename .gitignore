@@ -79,6 +79,8 @@ htmlcov/
 .pytest_cache/
 
 # ML training
+ml/data/
+bench/data/
 checkpoints/
 wandb/
 runs/
