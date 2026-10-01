@@ -25,7 +25,13 @@ class Settings(BaseSettings):
     model_path: str = "/app/models/clause_risknet.onnx"
     calibration_path: str = "/app/models/calibration.json"
     sklearn_model_dir: str = "/app/models/sklearn"
-    
+
+    # Retrieval
+    retriever: str = "hybrid"  # tfidf | vector | hybrid (falls back to tfidf if unavailable)
+    rrf_k: int = 60
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_model_revision: str = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"  # Pinned HF commit, baked into the image
+
     # Storage
     storage_path: str = "/app/storage"
     max_upload_size: int = 10485760  # 10MB
