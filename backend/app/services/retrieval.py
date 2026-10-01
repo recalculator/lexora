@@ -224,11 +224,22 @@ PGVECTOR_TABLES = {
 }
 
 
+# Planner settings applied (SET LOCAL) to queries filtered on an array column.
+# HNSW with a selective WHERE clause and hnsw.iterative_scan=off returns far
+# fewer than LIMIT rows (measured in bench/results/20261001T165752Z_local.json,
+# part_b_filtered), so filtered lookups use exact search instead: with index
+# scans and sequential scans off, Postgres uses the GIN index on the array
+# column (bitmap scan) and sorts the matching rows by exact distance. Bitmap
+# scans are enabled explicitly so the GIN path holds whatever the session set.
+EXACT_FILTER_SETTINGS = {"enable_indexscan": "off", "enable_seqscan": "off", "enable_bitmapscan": "on"}
+
+
 class PgVectorRetriever(Retriever):
     """Cosine-distance kNN over a pgvector column.
 
-    Score is cosine similarity (1 - cosine distance). Whether an index is used
-    depends on the planner and on session settings; see bench/ for measurements.
+    Score is cosine similarity (1 - cosine distance). Unfiltered queries may use
+    the HNSW index; queries filtered on an array column (e.g. categories) run as
+    exact search over the GIN-matched rows (see EXACT_FILTER_SETTINGS).
     """
 
     name = "vector"
@@ -292,13 +303,39 @@ class PgVectorRetriever(Retriever):
     def retrieve_by_vector(
         self, query_vec: Sequence[float], top_k: int = 5, filters: Optional[Dict[str, Any]] = None
     ) -> List[RetrievalResult]:
+        rows = self._execute(query_vec, top_k, filters)
+        return [RetrievalResult(r.clause_id, r.text, float(r.score)) for r in rows]
+
+    def explain_by_vector(
+        self, query_vec: Sequence[float], top_k: int = 5, filters: Optional[Dict[str, Any]] = None
+    ) -> dict:
+        """EXPLAIN (FORMAT JSON) plan for the query retrieve_by_vector would run."""
+        return self._execute(query_vec, top_k, filters, explain=True)[0][0][0]
+
+    def _uses_exact_filter(self, filters: Optional[Dict[str, Any]]) -> bool:
+        return any(key in self.array_columns for key in {**self.scope, **(filters or {})})
+
+    def _execute(self, query_vec, top_k, filters, explain=False):
         params: Dict[str, Any] = {"q": vector_literal(query_vec), "k": top_k}
-        stmt = sql_text(self._build_sql(filters, params))
+        sql = self._build_sql(filters, params)
+        stmt = sql_text(("EXPLAIN (FORMAT JSON) " if explain else "") + sql)
         for name, value in params.items():
             if isinstance(value, tuple):
                 stmt = stmt.bindparams(bindparam(name, expanding=True))
+
+        if not self._uses_exact_filter(filters):
+            return self.session.execute(stmt, params).fetchall()
+
+        # SET LOCAL lasts until the end of the transaction, so restore the
+        # previous values afterwards to keep other queries (e.g. same-contract
+        # retrieval) unaffected. On error the caller's rollback resets them.
+        previous = {name: self.session.execute(sql_text(f"SHOW {name}")).scalar() for name in EXACT_FILTER_SETTINGS}
+        for name, value in EXACT_FILTER_SETTINGS.items():
+            self.session.execute(sql_text(f"SET LOCAL {name} = {value}"))
         rows = self.session.execute(stmt, params).fetchall()
-        return [RetrievalResult(r.clause_id, r.text, float(r.score)) for r in rows]
+        for name, value in previous.items():
+            self.session.execute(sql_text(f"SET LOCAL {name} = :value"), {"value": value})
+        return rows
 
 
 # ---------------------------------------------------------------------------
