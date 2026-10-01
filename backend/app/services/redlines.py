@@ -2,7 +2,7 @@
 from typing import List, Dict, Optional
 from pydantic import BaseModel, Field
 from app.services.llm_client import call_llm_with_schema, log_prompt
-from app.services.retrieval import create_retrieval
+from app.services.rag import CITATION_INSTRUCTIONS, build_context, check_grounding, order_priority_clauses
 from app.core.logging import get_logger
 
 logger = get_logger()
@@ -16,7 +16,8 @@ class RedlineSuggestion(BaseModel):
     suggested_change: str = Field(description="Suggested redline change")
     rationale: str = Field(description="Reason for the change")
     risk_reduction: str = Field(description="How this reduces risk")
-    citation: str = Field(description="Reference to contract section")
+    citation: str = Field(description="Reference to contract section, citing evidence IDs such as C4 or P1043")
+    evidence_ids: List[str] = Field(default_factory=list, description="IDs of the evidence relied on, e.g. [\"C4\", \"P1043\"]")
 
 
 class RedlineSuggestions(BaseModel):
@@ -27,45 +28,39 @@ class RedlineSuggestions(BaseModel):
     general_notes: List[str] = Field(description="General notes about redlining")
 
 
-def generate_redlines(clauses: List[Dict[str, any]], document_text: str, document_id: Optional[int] = None) -> RedlineSuggestions:
+def generate_redlines(
+    clauses: List[Dict[str, any]],
+    document_text: str,
+    document_id: Optional[int] = None,
+    db=None,
+) -> RedlineSuggestions:
     """
     Generate redline suggestions using LLM with RAG.
     
     Args:
         clauses: List of clause dictionaries with classification results
         document_text: Full document text
+        document_id: Document ID (scopes same-contract retrieval)
+        db: Database session for vector retrieval (TF-IDF only if None)
         
     Returns:
         RedlineSuggestions instance
     """
     logger.info("Generating redline suggestions", num_clauses=len(clauses))
     
-    # Create retrieval index
-    retrieval = create_retrieval(clauses)
-    
-    # Build context from high-risk clauses
-    high_risk_clauses = [
-        c for c in clauses
-        if c.get("risk_score", 0) > 50 and c.get("clause_type") is not None
-    ]
-    
-    context_parts = []
-    for clause in high_risk_clauses[:8]:  # Top 8 for redlining
-        clause_text = clause.get("text", "")[:800]  # Longer for redlines
-        clause_type = clause.get("clause_type", "Unknown")
-        risk_score = clause.get("risk_score", 0)
-        clause_idx = clause.get("idx", 0)
-        context_parts.append(
-            f"Clause {clause_idx} ({clause_type}, Risk: {risk_score:.1f}):\n{clause_text}\n"
-        )
-    
-    context = "\n".join(context_parts)
+    # Top 8 typed high-risk clauses, highest risk first, with longer clause
+    # text for redlining plus retrieved same-contract clauses and precedents.
+    # Context is capped at 8000 chars (whole evidence blocks only).
+    priority = order_priority_clauses(clauses, min_risk=50, limit=8, require_type=True)
+    evidence = build_context(priority, clauses, session=db, document_id=document_id, clause_chars=800, max_chars=8000)
     
     # Build prompt
     prompt = f"""You are a legal contract redlining expert. Analyze the following contract clauses and generate specific redline suggestions.
 
 CONTRACT CLAUSES:
-{context[:4000]}  # Truncate to avoid token limits
+{evidence.text}
+
+{CITATION_INSTRUCTIONS}
 
 TASK:
 Generate redline suggestions that include:
@@ -102,6 +97,7 @@ RESPOND WITH VALID JSON matching the schema."""
             response=json.dumps(redlines.model_dump())
         )
         
+        check_grounding(redlines.priority_redlines + redlines.optional_redlines, evidence, kind="redlines")
         logger.info("Generated redline suggestions", num_priority=len(redlines.priority_redlines))
         return redlines
     except Exception as e:

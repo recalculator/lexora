@@ -2,7 +2,7 @@
 from typing import List, Dict, Optional
 from pydantic import BaseModel, Field
 from app.services.llm_client import call_llm_with_schema, log_prompt
-from app.services.retrieval import create_retrieval
+from app.services.rag import CITATION_INSTRUCTIONS, build_context, check_grounding, order_priority_clauses
 from app.core.logging import get_logger
 
 logger = get_logger()
@@ -16,7 +16,8 @@ class ClauseRecommendation(BaseModel):
     concern: str = Field(description="Main concern with this clause")
     recommendation: str = Field(description="Recommended action")
     negotiation_strategy: str = Field(description="Specific negotiation strategy")
-    citation: str = Field(description="Reference to contract section")
+    citation: str = Field(description="Reference to contract section, citing evidence IDs such as C4 or P1043")
+    evidence_ids: List[str] = Field(default_factory=list, description="IDs of the evidence relied on, e.g. [\"C4\", \"P1043\"]")
 
 
 class NegotiationPlaybook(BaseModel):
@@ -28,44 +29,39 @@ class NegotiationPlaybook(BaseModel):
     key_provisions: List[str] = Field(description="Key provisions to highlight")
 
 
-def generate_playbook(clauses: List[Dict[str, any]], document_text: str, document_id: Optional[int] = None) -> NegotiationPlaybook:
+def generate_playbook(
+    clauses: List[Dict[str, any]],
+    document_text: str,
+    document_id: Optional[int] = None,
+    db=None,
+) -> NegotiationPlaybook:
     """
     Generate negotiation playbook using LLM with RAG.
     
     Args:
         clauses: List of clause dictionaries with classification results
         document_text: Full document text
+        document_id: Document ID (scopes same-contract retrieval)
+        db: Database session for vector retrieval (TF-IDF only if None)
         
     Returns:
         NegotiationPlaybook instance
     """
     logger.info("Generating negotiation playbook", num_clauses=len(clauses))
     
-    # Create retrieval index
-    retrieval = create_retrieval(clauses)
-    
-    # Build context from high-risk clauses
-    high_risk_clauses = [
-        c for c in clauses
-        if c.get("risk_score", 0) > 60
-    ]
-    
-    context_parts = []
-    for clause in high_risk_clauses[:10]:  # Top 10 high-risk clauses
-        clause_text = clause.get("text", "")[:500]  # Truncate
-        clause_type = clause.get("clause_type", "Unknown")
-        risk_score = clause.get("risk_score", 0)
-        context_parts.append(
-            f"Clause {clause.get('idx', 0)} ({clause_type}, Risk: {risk_score:.1f}):\n{clause_text}\n"
-        )
-    
-    context = "\n".join(context_parts)
+    # Top 10 high-risk clauses, highest risk first, each with retrieved
+    # same-contract clauses and precedents. Context is capped at 6000 chars
+    # (whole evidence blocks only) to avoid token limits.
+    priority = order_priority_clauses(clauses, min_risk=60, limit=10)
+    evidence = build_context(priority, clauses, session=db, document_id=document_id, clause_chars=500, max_chars=6000)
     
     # Build prompt
     prompt = f"""You are a legal contract negotiation expert. Analyze the following contract clauses and generate a comprehensive negotiation playbook.
 
 CONTRACT CONTEXT:
-{context[:3000]}  # Truncate to avoid token limits
+{evidence.text}
+
+{CITATION_INSTRUCTIONS}
 
 TASK:
 Generate a negotiation playbook that includes:
@@ -96,6 +92,7 @@ RESPOND WITH VALID JSON matching the schema."""
             response=json.dumps(playbook.model_dump())
         )
         
+        check_grounding(playbook.priority_clauses, evidence, kind="playbook")
         logger.info("Generated negotiation playbook", num_recommendations=len(playbook.priority_clauses))
         return playbook
     except Exception as e:

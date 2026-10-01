@@ -1,0 +1,32 @@
+{
+  "_description": "Hand-written mapping from Lexora's 8 clause types to CUAD categories. Used ONLY for runtime precedent retrieval from reference_clauses; the benchmark uses CUAD's native categories and does not read this file. A null entry means no clear CUAD equivalent: precedent search runs unfiltered and is logged. 'loose' lists categories included in 'categories' that are only an approximate match.",
+  "mappings": {
+    "Termination": {
+      "categories": ["Termination For Convenience", "Notice Period To Terminate Renewal", "Post-Termination Services"],
+      "loose": ["Notice Period To Terminate Renewal"],
+      "note": "Notice Period To Terminate Renewal concerns notice to stop auto-renewal, not termination itself."
+    },
+    "Indemnification": null,
+    "Liability Cap": {
+      "categories": ["Cap On Liability", "Uncapped Liability"],
+      "loose": []
+    },
+    "Confidentiality": null,
+    "Insurance": {
+      "categories": ["Insurance"],
+      "loose": []
+    },
+    "Intellectual Property": {
+      "categories": ["Ip Ownership Assignment", "Joint Ip Ownership", "License Grant"],
+      "loose": []
+    },
+    "Assignment": {
+      "categories": ["Anti-Assignment", "Change Of Control"],
+      "loose": []
+    },
+    "Governing Law": {
+      "categories": ["Governing Law"],
+      "loose": []
+    }
+  }
+}
