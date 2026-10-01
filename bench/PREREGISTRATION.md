@@ -110,3 +110,50 @@ original results file and its companions are left unmodified. Their outputs go t
    difference with a 95% percentile bootstrap CI (10,000 resamples of queries, seed 42). The
    per-method means recomputed from the per-query file must equal the means in the original results
    file; the script fails otherwise.
+
+## Amendment, 2026-10-01: Azure protocol (made before any Azure results)
+
+Written **before** any Azure benchmark results were produced. At the time of writing, the only
+Azure artifacts are the setup checks and the corpus load record
+(`bench/results/load_20261001T204133Z_azure.json`); `make bench ENV=azure` has not been run. This
+amendment adds to the design above and changes nothing in it. All Part A/B/C definitions, metrics,
+query sets and methods are unchanged.
+
+**Environment.** Azure Database for PostgreSQL Flexible Server, Burstable B1ms (1 vCore, 2 GiB RAM,
+32 GiB storage, P4 120 IOPS), PostgreSQL 16.15, pgvector 0.8.2, region Canada Central, SSL required.
+The client is the same machine and Docker image as the local run, in Champaign, Illinois, on a home
+network. Two known differences from the local run are recorded and not controlled for: pgvector
+0.8.2 on Azure vs 0.8.6 locally, and x86_64 (Azure) vs aarch64 (local Docker) server builds. The
+results file records the server hostname only as `<azure-flexible-server>`; the connection string
+is never recorded.
+
+1. **Index built after load, then VACUUM ANALYZE (protocol difference).** Locally the HNSW index
+   existed before the corpus was loaded, so it was built incrementally by the inserts. On Azure the
+   corpus is loaded, then `ix_reference_clauses_embedding_hnsw` is dropped and recreated with the
+   migration defaults (m=16, ef_construction=64), then `VACUUM ANALYZE reference_clauses` is run.
+   This affects the index Part A uses. Part B rebuilds the index itself in both environments. The
+   harness records the index definition, its size and the table's vacuum/analyze timestamps at the
+   start of the run (`index_state_at_start`).
+2. **Network baseline.** Before Part A, the harness times `SELECT 1` on the benchmark connection
+   (20 warmup queries discarded, then 500 timed) and records client round-trip p50/p95/p99
+   (`network_baseline_start`). The same measurement is repeated at the very end
+   (`network_baseline_end`). From this amendment on it is recorded for every environment.
+3. **Server-side execution time is the primary cross-environment comparison.** Client round-trip
+   latency on Azure includes the Champaign to Canada Central network path and is reported
+   alongside, not used as the comparison. Latency comparisons between local and Azure use
+   `EXPLAIN (ANALYZE, BUFFERS)` "Execution Time".
+4. **Throttling check (repeated first configuration).** B1ms is burstable: when CPU credits run
+   out the server is held to baseline CPU. At the very end of the run (after Part C), the harness
+   re-measures Part B's first configuration (`exact`, `enable_indexscan = off`) with the same
+   warmup sample and queries, and records it next to the first measurement with repeat/first
+   ratios of client p50 and server execution p50 (`throttle_check`). Interpretation rule, fixed
+   now: if the repeat's server execution p50 is more than 1.2× the first's, the run's latency
+   results are reported as possibly affected by throttling. Quality metrics (Part A) are not
+   affected by throttling and are reported as usual. No latency number is adjusted or corrected.
+5. **User-reported CPU credits.** Before the run starts and after it ends, the harness pauses and
+   asks the operator for the Azure portal value of the metric "CPU Credits Remaining"
+   (`cpu_credits_remaining`; Monitoring > Metrics). The answer and the data-point time are stored
+   verbatim with `"source": "user-reported from Azure portal"`
+   (`cpu_credits_user_reported`). The harness doesn't verify, parse or infer these values. Microsoft
+   documents that this metric can be displayed up to five minutes late, so a value may not reflect
+   the exact moment of entry.

@@ -40,6 +40,14 @@ DEFAULT_EF_SEARCH = 40
 EF_SEARCH_VALUES = [10, 20, 40, 80, 160]
 WARMUP_QUERIES = 100
 FILTER_SAMPLE = 200
+NETWORK_BASELINE_QUERIES = 500
+NETWORK_BASELINE_WARMUP = 20
+REDACTED_HOST = "<azure-flexible-server>"
+# Azure Monitor metric for Burstable servers: display name "CPU Credits Remaining",
+# REST name cpu_credits_remaining (Microsoft Learn, supported metrics for
+# Microsoft.DBforPostgreSQL/flexibleServers)
+CREDIT_METRIC = "CPU Credits Remaining (cpu_credits_remaining)"
+AZURE_META_VARS = ("BENCH_AZURE_REGION", "BENCH_AZURE_SKU", "BENCH_CLIENT_LOCATION")
 HNSW_INDEX = "ix_reference_clauses_embedding_hnsw"
 HNSW_DEFAULT_DDL = (
     f"CREATE INDEX {HNSW_INDEX} ON reference_clauses "
@@ -134,6 +142,55 @@ def index_definitions(db) -> list:
     ))
 
 
+def index_state(db) -> dict:
+    """HNSW index definition and size, and the table's vacuum/analyze state."""
+    stats = db.q(
+        "SELECT n_live_tup, n_dead_tup, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze "
+        "FROM pg_stat_user_tables WHERE relname = 'reference_clauses'"
+    )[0]
+    keys = ["n_live_tup", "n_dead_tup", "last_vacuum", "last_autovacuum", "last_analyze", "last_autoanalyze"]
+    return {
+        "hnsw_index": HNSW_INDEX,
+        "hnsw_definition": db.scalar("SELECT indexdef FROM pg_indexes WHERE indexname = %s", (HNSW_INDEX,)),
+        "hnsw_size_bytes": int(db.scalar("SELECT pg_relation_size(%s::regclass)", (HNSW_INDEX,))),
+        "table": {k: (v.isoformat() if hasattr(v, "isoformat") else v) for k, v in zip(keys, stats)},
+        "measured_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def network_baseline(db, n=NETWORK_BASELINE_QUERIES, warmup=NETWORK_BASELINE_WARMUP) -> dict:
+    """Client round trip for SELECT 1 on the benchmark connection (execute + fetch)."""
+    db.reset()
+    for _ in range(warmup):
+        db.q("SELECT 1")
+    lat = []
+    for _ in range(n):
+        t0 = time.perf_counter()
+        db.q("SELECT 1")
+        lat.append((time.perf_counter() - t0) * 1000)
+    return {"query": "SELECT 1", "n_timed": n, "n_warmup": warmup, "client_ms": M.percentiles(lat),
+            "measured_at_utc": datetime.now(timezone.utc).isoformat()}
+
+
+def ask_credits(when: str, input_fn=input) -> dict:
+    """Pause and ask the operator to read CPU credits from the Azure portal.
+
+    The answer is stored verbatim; nothing is parsed or inferred from it.
+    """
+    print(f"\n=== Azure CPU credits ({when} the run) ===\n"
+          f"In the Azure portal open the server, then Monitoring > Metrics, metric {CREDIT_METRIC}.\n"
+          "The portal can lag by up to ~5 minutes; read the most recent data point.", flush=True)
+    value = input_fn("Value shown (leave blank if unavailable): ").strip()
+    point_time = input_fn("Time of that data point as shown in the portal, with time zone (optional): ").strip()
+    return {
+        "source": "user-reported from Azure portal",
+        "metric": CREDIT_METRIC,
+        "value_as_entered": value or None,
+        "data_point_time_as_entered": point_time or None,
+        "entered_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Environment
 # ---------------------------------------------------------------------------
@@ -164,10 +221,13 @@ def environment(db, args, corpus_meta_path, split_path, n_reference, n_eval_rows
         "postgres_version": db.scalar("SELECT version()"),
         "postgres_server_version_num": db.scalar("SHOW server_version_num"),
         "pgvector_version": db.scalar("SELECT extversion FROM pg_extension WHERE extname = 'vector'"),
-        "db_host": url.hostname,
+        # Never record a non-local hostname: results files are committed
+        "db_host": url.hostname if args.env == "local" else REDACTED_HOST,
         "db_ssl": db.conn.info.ssl_in_use,
         "host_description": os.getenv("BENCH_HOST_DESC") or ("local Docker" if args.env == "local" else None),
         "azure_sku": os.getenv("BENCH_AZURE_SKU"),
+        "azure_region": os.getenv("BENCH_AZURE_REGION"),
+        "client_location": os.getenv("BENCH_CLIENT_LOCATION"),
         "server_settings": show,
         "client": {
             "platform": platform.platform(),
@@ -383,9 +443,16 @@ def build_index(db, name, ddl):
     return {"name": name, "ddl": ddl, "build_seconds": build_s, "size_bytes": int(size)}
 
 
-def part_b(db, eval_vecs, exact, n_reference, args):
+def warmup_sample(eval_vecs):
     rng = random.Random(SEED)
-    warmup = [eval_vecs[i] for i in rng.sample(range(len(eval_vecs)), min(WARMUP_QUERIES, len(eval_vecs)))]
+    return [eval_vecs[i] for i in rng.sample(range(len(eval_vecs)), min(WARMUP_QUERIES, len(eval_vecs)))]
+
+
+FIRST_CONFIG = ("exact", {"enable_indexscan": "off"}, "none")
+
+
+def part_b(db, eval_vecs, exact, n_reference, args):
+    warmup = warmup_sample(eval_vecs)
     qvecs = eval_vecs
     out = {"n_queries": len(qvecs), "configs": [], "indexes": []}
     start_defs = index_definitions(db)
@@ -393,8 +460,8 @@ def part_b(db, eval_vecs, exact, n_reference, args):
 
     try:
         # Exact baseline (no vector index usable)
-        out["configs"].append(measure_config(
-            db, "exact", {"enable_indexscan": "off"}, qvecs, warmup, exact, "none"))
+        label, settings, expect = FIRST_CONFIG
+        out["configs"].append(measure_config(db, label, dict(settings), qvecs, warmup, exact, expect))
 
         # HNSW (rebuilt with the migration's parameters so build time is measured)
         out["indexes"].append({"family": "hnsw", **build_index(db, HNSW_INDEX, HNSW_DEFAULT_DDL)})
@@ -511,6 +578,28 @@ def part_b_filtered(db, eval_vecs, n_relevant, args):
     return out
 
 
+def repeat_first_config(db, eval_vecs, exact, first):
+    """Re-measure Part B's first configuration at the very end of the run.
+
+    On a burstable server, a slower repeat than the first measurement points to
+    CPU throttling (credits exhausted) during the run.
+    """
+    label, settings, expect = FIRST_CONFIG
+    repeat = measure_config(db, f"{label} (repeat at end)", dict(settings), eval_vecs,
+                            warmup_sample(eval_vecs), exact, expect)
+    ratio = lambda a, b: a / b if b else None  # noqa: E731
+    return {
+        "config": label,
+        "first": {"client_ms": first["client_ms"], "server_execution_ms": first["server"]["execution_ms"]},
+        "repeat": repeat,
+        "repeat_over_first": {
+            "client_p50": ratio(repeat["client_ms"]["p50"], first["client_ms"]["p50"]),
+            "server_execution_p50": ratio(repeat["server"]["execution_ms"]["p50"],
+                                          first["server"]["execution_ms"]["p50"]),
+        },
+    }
+
+
 # ---------------------------------------------------------------------------
 # Part C: end-to-end stage timing
 # ---------------------------------------------------------------------------
@@ -591,10 +680,22 @@ def main():
     parser.add_argument("--parts", default="A,B,F,C", help="Subset of A,B,F (filtered),C")
     parser.add_argument("--dry-run", action="store_true",
                         help="Small query subsets to exercise the code; results are not for reporting")
+    parser.add_argument("--repeat-first-config", action="store_true",
+                        help="Re-measure Part B's first configuration at the very end (throttling check)")
+    parser.add_argument("--credit-prompts", action="store_true",
+                        help="Pause before and after the run for user-reported Azure CPU credits (needs a TTY)")
     args = parser.parse_args()
     parts = set(args.parts.upper().split(","))
     if "DATABASE_URL" not in os.environ:
         sys.exit("ERROR: DATABASE_URL must be set")
+    if args.repeat_first_config and "B" not in parts:
+        sys.exit("ERROR: --repeat-first-config needs part B")
+    if args.credit_prompts and not sys.stdin.isatty():
+        sys.exit("ERROR: --credit-prompts needs an interactive terminal (docker run -it)")
+    if args.env != "local" and not args.dry_run:
+        missing = [v for v in AZURE_META_VARS if not os.getenv(v)]
+        if missing:
+            sys.exit(f"ERROR: set {', '.join(missing)} for ENV={args.env} (see docs/AZURE.md)")
 
     from app.services.retrieval import get_embedder
     corpus_path = ROOT / "bench/data/cuad_corpus.jsonl"
@@ -620,6 +721,8 @@ def main():
         global EF_SEARCH_VALUES, FILTER_SAMPLE, WARMUP_QUERIES
         EF_SEARCH_VALUES, FILTER_SAMPLE, WARMUP_QUERIES = [10, 40], 20, 10
 
+    credits_before = ask_credits("before") if args.credit_prompts else None
+
     embedder = get_embedder()
     log(f"Embedding {len(eval_rows)} eval texts and {len(questions)} questions")
     eval_vecs = embedder.encode([r["text"] for r in eval_rows])
@@ -628,6 +731,10 @@ def main():
     result = {"environment": environment(db, args, meta_path, split_path, len(ref), len(eval_rows)),
               "preregistration": "bench/PREREGISTRATION.md",
               "corpus_meta": "bench/corpus/cuad_corpus_meta.json"}
+    result["index_state_at_start"] = index_state(db)
+    log(f"Network baseline: {NETWORK_BASELINE_QUERIES} x SELECT 1")
+    result["network_baseline_start"] = network_baseline(db)
+    log(f"  SELECT 1 p50={result['network_baseline_start']['client_ms']['p50']:.2f}ms")
     per_query = None
     exact = None
     n_relevant = {c: sum(1 for r in ref if c in r["categories"]) for c in categories}
@@ -644,6 +751,12 @@ def main():
     if "C" in parts:
         log("Part C: end-to-end stage timing")
         result["part_c"] = part_c(args, runs=3 if args.dry_run else 20, warmup=1 if args.dry_run else 3)
+    if args.repeat_first_config:
+        log("Throttling check: repeating Part B's first configuration")
+        result["throttle_check"] = repeat_first_config(db, eval_vecs, exact, result["part_b"]["configs"][0])
+    result["network_baseline_end"] = network_baseline(db)
+    if args.credit_prompts:
+        result["cpu_credits_user_reported"] = {"before": credits_before, "after": ask_credits("after")}
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     suffix = f"{stamp}_{args.env}" + ("_dryrun" if args.dry_run else "")

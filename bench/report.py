@@ -36,6 +36,9 @@ def md_environment(env):
         ("Timestamp (UTC)", env["timestamp_utc"]),
         ("Host", env.get("host_description") or ""),
         ("Azure SKU", env.get("azure_sku") or ""),
+        ("Azure region", env.get("azure_region") or ""),
+        ("Client location", env.get("client_location") or ""),
+        ("DB host", env.get("db_host") or ""),
         ("Postgres", env["postgres_version"]),
         ("pgvector", env["pgvector_version"]),
         ("SSL in use", env["db_ssl"]),
@@ -51,6 +54,46 @@ def md_environment(env):
         ("Git commit", f"{env['git']['commit']} (dirty files: {env['git']['dirty_files']})"),
     ]
     return table(["Field", "Value"], rows)
+
+
+def md_run_conditions(r):
+    """Network baseline, index state, throttling check and user-reported credits (if recorded)."""
+    out = []
+    rows = []
+    for key, label in (("network_baseline_start", "start"), ("network_baseline_end", "end")):
+        if key in r:
+            c = r[key]["client_ms"]
+            rows.append((label, r[key]["n_timed"], f"{c['p50']:.2f}", f"{c['p95']:.2f}", f"{c['p99']:.2f}"))
+    if rows:
+        out += ["### Network baseline (SELECT 1, client round trip)\n",
+                table(["When", "Timed queries", "p50 ms", "p95 ms", "p99 ms"], rows), ""]
+    if "index_state_at_start" in r:
+        s = r["index_state_at_start"]
+        t = s["table"]
+        out += ["### Index state at start\n", table(["Field", "Value"], [
+            ("HNSW definition", s["hnsw_definition"]),
+            ("HNSW size (bytes)", s["hnsw_size_bytes"]),
+            ("Live / dead tuples", f"{t['n_live_tup']} / {t['n_dead_tup']}"),
+            ("Last vacuum / autovacuum", f"{t['last_vacuum']} / {t['last_autovacuum']}"),
+            ("Last analyze / autoanalyze", f"{t['last_analyze']} / {t['last_autoanalyze']}"),
+        ]), ""]
+    if "throttle_check" in r:
+        tc = r["throttle_check"]
+        rep = tc["repeat"]
+        out += [f"### Throttling check: `{tc['config']}` repeated at the end\n", table(
+            ["Measurement", "Client p50 ms", "Client p95 ms", "Server exec p50 ms", "Server exec p95 ms"], [
+                ("first", f"{tc['first']['client_ms']['p50']:.2f}", f"{tc['first']['client_ms']['p95']:.2f}",
+                 f"{tc['first']['server_execution_ms']['p50']:.2f}", f"{tc['first']['server_execution_ms']['p95']:.2f}"),
+                ("repeat", f"{rep['client_ms']['p50']:.2f}", f"{rep['client_ms']['p95']:.2f}",
+                 f"{rep['server']['execution_ms']['p50']:.2f}", f"{rep['server']['execution_ms']['p95']:.2f}"),
+            ]), ""]
+    if "cpu_credits_user_reported" in r:
+        cr = r["cpu_credits_user_reported"]
+        out += ["### CPU credits (user-reported from Azure portal)\n", table(
+            ["When", "Metric", "Value as entered", "Data point time as entered", "Entered at (UTC)"],
+            [(w, cr[w]["metric"], cr[w]["value_as_entered"] or "not provided",
+              cr[w]["data_point_time_as_entered"] or "", cr[w]["entered_at_utc"]) for w in ("before", "after")]), ""]
+    return "\n".join(out)
 
 
 def md_part_a(a):
@@ -244,6 +287,9 @@ def render(results_path: Path):
     parts += [f"# Retrieval benchmark: {env['env']}\n", f"Source: `{results_path.name}`. "
               f"Design: `{r['preregistration']}`. Corpus stats: `{r['corpus_meta']}`.\n",
               "## Environment\n", md_environment(env), ""]
+    conditions = md_run_conditions(r)
+    if conditions:
+        parts += ["## Run conditions\n", conditions]
     if "part_a" in r:
         parts += ["## A. Retrieval quality (eval split -> reference split)\n", md_part_a(r["part_a"]), ""]
         plot_methods(r["part_a"], f"{stem}_methods.png")

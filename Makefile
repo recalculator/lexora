@@ -60,7 +60,9 @@ status:
 #   make load-corpus ENV=...    load reference split into reference_clauses (REPLACE=1 to reload)
 #   make bench ENV=local|azure  full benchmark -> bench/results/<ts>_<env>.json + .md + plots
 #   make bench-dry ENV=...      small-subset dry run into the scratch dir (not for reporting)
-# ENV=azure uses DATABASE_URL from your shell environment (never written to files).
+# ENV=azure uses DATABASE_URL from your shell environment (never written to files), and
+# make bench ENV=azure also needs BENCH_AZURE_REGION, BENCH_AZURE_SKU and BENCH_CLIENT_LOCATION
+# (docs/AZURE.md); it pauses before and after the run to ask for CPU credits from the portal.
 # ---------------------------------------------------------------------------
 ENV ?= local
 BENCH_IMAGE ?= lexora-bench
@@ -70,9 +72,15 @@ DRY_OUT ?= /tmp/lexora-bench-dry
 ifeq ($(ENV),local)
 BENCH_NET := --network lexora_network
 BENCH_DB := -e DATABASE_URL=$(LOCAL_DATABASE_URL)
+BENCH_TTY :=
+BENCH_RUN_FLAGS :=
 else
 BENCH_NET :=
 BENCH_DB := -e DATABASE_URL
+# Azure protocol (PREREGISTRATION.md Azure amendment): interactive CPU-credit
+# prompts and a repeat of Part B's first configuration at the end of the run
+BENCH_TTY := -it
+BENCH_RUN_FLAGS := --credit-prompts --repeat-first-config
 endif
 
 GIT_INFO = -e GIT_COMMIT="$$(git rev-parse HEAD)" \
@@ -80,7 +88,7 @@ GIT_INFO = -e GIT_COMMIT="$$(git rev-parse HEAD)" \
 	-e GIT_DIFF_SHA="$$(git diff HEAD | shasum -a 256 | cut -d' ' -f1)"
 CLIENT_INFO = -e BENCH_CLIENT_CPU="$$(sysctl -n machdep.cpu.brand_string 2>/dev/null || grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)" \
 	-e BENCH_DOCKER_RESOURCES="$$(docker info --format '{{.NCPU}} CPUs, {{.MemTotal}} bytes memory')" \
-	-e BENCH_AZURE_SKU -e BENCH_HOST_DESC
+	-e BENCH_AZURE_SKU -e BENCH_AZURE_REGION -e BENCH_CLIENT_LOCATION -e BENCH_HOST_DESC
 
 .PHONY: bench bench-dry bench-posthoc bench-precedent-diag bench-image bench-test corpus load-corpus check-db-url
 
@@ -104,8 +112,8 @@ bench-test: bench-image
 	docker run --rm -v "$(CURDIR):/repo" -w /repo $(BENCH_IMAGE) python -m pytest -q -p no:cacheprovider bench/tests
 
 bench: check-db-url bench-image
-	docker run --rm $(BENCH_NET) $(BENCH_DB) $(GIT_INFO) $(CLIENT_INFO) \
-		-v "$(CURDIR):/repo" -w /repo $(BENCH_IMAGE) python bench/run_bench.py --env $(ENV)
+	docker run --rm $(BENCH_TTY) $(BENCH_NET) $(BENCH_DB) $(GIT_INFO) $(CLIENT_INFO) \
+		-v "$(CURDIR):/repo" -w /repo $(BENCH_IMAGE) python bench/run_bench.py --env $(ENV) $(BENCH_RUN_FLAGS)
 
 bench-dry: check-db-url bench-image
 	mkdir -p $(DRY_OUT)
